@@ -180,6 +180,19 @@
 
   /* ── FOOTER ── */
   footer { text-align: center; padding: 2rem; font-size: 12px; color: var(--text-tertiary); border-top: 0.5px solid var(--border-strong); font-family: 'DM Mono', monospace; }
+  /* ── HEADER LINKS ── */
+  header a.data-link {
+    font-size: 12px; font-weight: 500; color: var(--blue);
+    text-decoration: none; border: 0.5px solid var(--blue);
+    padding: 5px 14px; border-radius: 6px; transition: background 0.15s;
+    display: flex; align-items: center; gap: 6px;
+  }
+  header a.data-link:hover { background: var(--blue-light); }
+  header a.data-link svg { width: 13px; height: 13px; }
+  header a.data-link.green { color: var(--teal); border-color: var(--teal); }
+  header a.data-link.green:hover { background: var(--teal-light); }
+  footer a { color: var(--blue); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
 </style>
 </head>
 <body>
@@ -192,6 +205,14 @@
   </div>
   <div class="header-right">
     <span class="meta">Pre: May 24 · Post: May 31 · 1-day read</span>
+    <a class="data-link" href="https://docs.google.com/document/d/1Jd7k8BmIg-NVPY3vZMu8PTCaXgU5gKpYyPi0Kf9XElc/edit?tab=t.0" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      PRD
+    </a>
+    <a href="https://docs.google.com/spreadsheets/d/17fKDXQ-mEEVJAV6Bi7r8nn4vCA0CIZVifCcoU8CaxSw/edit?gid=0#gid=0" target="_blank" rel="noopener" class="data-link green">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+      Data Sheet
+    </a>
   </div>
 </header>
 
