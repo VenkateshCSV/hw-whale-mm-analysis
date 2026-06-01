@@ -4,7 +4,47 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Whale PvP Matchmaking — Impact Analysis</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js">
+/* 9. Whale time spent */
+new Chart(document.getElementById('c_time_whale'), {
+  type: 'bar',
+  data: {
+    labels: ['Rookie','Challenger','Proven','Accomplished','Remarkable'],
+    datasets: [
+      { label: 'Pre', data: [58.1, 61.0, 67.5, 67.8, 78.4], backgroundColor: '#D85A30', borderRadius: 4 },
+      { label: 'Post', data: [57.1, 55.7, 61.3, 62.1, 71.2], backgroundColor: '#1D9E75', borderRadius: 4 }
+    ]
+  },
+  options: {
+    ...base,
+    plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y.toFixed(1)} mins` } } },
+    scales: {
+      x: { ...base.scales.x },
+      y: { ...base.scales.y, min: 40, max: 90, ticks: { ...base.scales.y.ticks, callback: v => v + ' m' } }
+    }
+  }
+});
+
+/* 10. Non-whale time spent */
+new Chart(document.getElementById('c_time_nonwhale'), {
+  type: 'bar',
+  data: {
+    labels: ['Rookie','Challenger','Proven','Accomplished','Remarkable'],
+    datasets: [
+      { label: 'Pre', data: [60.8, 59.1, 62.1, 64.3, 66.9], backgroundColor: '#D85A30', borderRadius: 4 },
+      { label: 'Post', data: [60.1, 56.7, 59.4, 60.6, 63.1], backgroundColor: '#85B7EB', borderRadius: 4 }
+    ]
+  },
+  options: {
+    ...base,
+    plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y.toFixed(1)} mins` } } },
+    scales: {
+      x: { ...base.scales.x },
+      y: { ...base.scales.y, min: 40, max: 90, ticks: { ...base.scales.y.ticks, callback: v => v + ' m' } }
+    }
+  }
+});
+</script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=DM+Mono:wght@400;500&display=swap');
 
@@ -522,10 +562,90 @@
     </div>
   </div>
 
-  <!-- ── SECTION 6: OPEN QUESTIONS ── -->
+  <!-- ── SECTION 6: TIME SPENT ── -->
   <div class="section">
     <div class="section-header">
-      <p class="section-num">06 — Open questions</p>
+      <p class="section-num">06 — Time spent</p>
+      <p class="section-title">Session time is down slightly for whales — worth monitoring</p>
+      <p class="section-sub">Average daily time spent in-game (mins), split by rank. Pre-change whales at higher ranks were spending significantly more time — likely driven by more matches played to grind through harder opponents. Post-change the drop is modest but directionally consistent.</p>
+    </div>
+    <div class="two-col" style="margin-bottom:1.25rem;">
+      <div class="card">
+        <p class="card-title">Avg. time spent (mins) — Whale, Pre vs Post</p>
+        <div class="legend">
+          <span class="leg"><span class="leg-sq" style="background:var(--coral)"></span>Pre (May 24)</span>
+          <span class="leg"><span class="leg-sq" style="background:var(--teal)"></span>Post (May 31)</span>
+        </div>
+        <div class="chart-wrap" style="height:240px;">
+          <canvas id="c_time_whale"></canvas>
+        </div>
+      </div>
+      <div class="card">
+        <p class="card-title">Avg. time spent (mins) — Non-Whale, Pre vs Post</p>
+        <div class="legend">
+          <span class="leg"><span class="leg-sq" style="background:var(--coral)"></span>Pre (May 24)</span>
+          <span class="leg"><span class="leg-sq" style="background:var(--blue-bar)"></span>Post (May 31)</span>
+        </div>
+        <div class="chart-wrap" style="height:240px;">
+          <canvas id="c_time_nonwhale"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="card" style="margin-bottom:1.25rem;">
+      <p class="card-title">Avg. time spent (mins) — full breakdown</p>
+      <table class="comp-table">
+        <thead>
+          <tr>
+            <th>Rank</th>
+            <th colspan="3" style="text-align:center;padding-bottom:4px;">Whale</th>
+            <th colspan="3" style="text-align:center;padding-bottom:4px;">Non-Whale</th>
+          </tr>
+          <tr>
+            <th></th>
+            <th class="pre">Pre</th><th class="post">Post</th><th class="delta">Δ</th>
+            <th class="pre">Pre</th><th class="post">Post</th><th class="delta">Δ</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="rank-badge rank-Rookie">Rookie</span></td>
+            <td>58.1</td><td class="val-down">57.1</td><td><span class="delta-pill down">−1.0</span></td>
+            <td>60.8</td><td class="val-down">60.1</td><td><span class="delta-pill down">−0.7</span></td>
+          </tr>
+          <tr>
+            <td><span class="rank-badge rank-Challenger">Challenger</span></td>
+            <td>61.0</td><td class="val-down">55.7</td><td><span class="delta-pill down">−5.3</span></td>
+            <td>59.1</td><td class="val-down">56.7</td><td><span class="delta-pill down">−2.4</span></td>
+          </tr>
+          <tr>
+            <td><span class="rank-badge rank-Proven">Proven</span></td>
+            <td>67.5</td><td class="val-down">61.3</td><td><span class="delta-pill down">−6.2</span></td>
+            <td>62.1</td><td class="val-down">59.4</td><td><span class="delta-pill down">−2.7</span></td>
+          </tr>
+          <tr>
+            <td><span class="rank-badge rank-Accomplished">Accomplished</span></td>
+            <td>67.8</td><td class="val-down">62.1</td><td><span class="delta-pill down">−5.7</span></td>
+            <td>64.3</td><td class="val-down">60.6</td><td><span class="delta-pill down">−3.7</span></td>
+          </tr>
+          <tr>
+            <td><span class="rank-badge rank-Remarkable">Remarkable</span></td>
+            <td>78.4</td><td class="val-down">71.2</td><td><span class="delta-pill down">−7.2</span></td>
+            <td>66.9</td><td class="val-down">63.1</td><td><span class="delta-pill down">−3.8</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="insights">
+      <div class="insight warn"><strong>Whale time spent is down 1–7 mins across all ranks.</strong> The drop is largest at Remarkable (−7.2 mins) and Proven (−6.2 mins). Pre-change, whales at higher ranks were likely grinding more matches to fight through harder opponents — inflating time spent. Post-change, easier wins may mean matches resolve faster, pulling the average down.</div>
+      <div class="insight"><strong>Non-whale time spent also dipped slightly (−0.7 to −3.8 mins).</strong> The non-whale drop mirrors the whale trend, which suggests this may partly be a day-level or platform-level effect rather than purely driven by the matchmaking change. Worth separating before drawing conclusions.</div>
+      <div class="insight warn"><strong>Monitor over the next 7 days.</strong> If time spent continues declining for whales specifically, it may indicate the new match format (quick wins, more quits) is reducing session depth. The key question is whether PvP matches/day compensates — a shorter but more frequent session pattern would still be healthy.</div>
+    </div>
+  </div>
+
+  <!-- ── SECTION 7: OPEN QUESTIONS ── -->
+  <div class="section">
+    <div class="section-header">
+      <p class="section-num">07 — Open questions</p>
       <p class="section-title">What to track as more post-change data accumulates</p>
       <p class="section-sub">With only 1 day of data, these are the signals to watch over the next 7–14 days before drawing final conclusions.</p>
     </div>
@@ -737,6 +857,46 @@ new Chart(document.getElementById('c_league_adopt'), {
     scales: {
       x: { ...base.scales.x },
       y: { ...base.scales.y, min: 30, max: 80, ticks: { ...base.scales.y.ticks, callback: v => v + '%' } }
+    }
+  }
+});
+
+/* 9. Whale time spent */
+new Chart(document.getElementById('c_time_whale'), {
+  type: 'bar',
+  data: {
+    labels: ['Rookie','Challenger','Proven','Accomplished','Remarkable'],
+    datasets: [
+      { label: 'Pre', data: [58.1, 61.0, 67.5, 67.8, 78.4], backgroundColor: '#D85A30', borderRadius: 4 },
+      { label: 'Post', data: [57.1, 55.7, 61.3, 62.1, 71.2], backgroundColor: '#1D9E75', borderRadius: 4 }
+    ]
+  },
+  options: {
+    ...base,
+    plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y.toFixed(1)} mins` } } },
+    scales: {
+      x: { ...base.scales.x },
+      y: { ...base.scales.y, min: 40, max: 90, ticks: { ...base.scales.y.ticks, callback: v => v + ' m' } }
+    }
+  }
+});
+
+/* 10. Non-whale time spent */
+new Chart(document.getElementById('c_time_nonwhale'), {
+  type: 'bar',
+  data: {
+    labels: ['Rookie','Challenger','Proven','Accomplished','Remarkable'],
+    datasets: [
+      { label: 'Pre', data: [60.8, 59.1, 62.1, 64.3, 66.9], backgroundColor: '#D85A30', borderRadius: 4 },
+      { label: 'Post', data: [60.1, 56.7, 59.4, 60.6, 63.1], backgroundColor: '#85B7EB', borderRadius: 4 }
+    ]
+  },
+  options: {
+    ...base,
+    plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y.toFixed(1)} mins` } } },
+    scales: {
+      x: { ...base.scales.x },
+      y: { ...base.scales.y, min: 40, max: 90, ticks: { ...base.scales.y.ticks, callback: v => v + ' m' } }
     }
   }
 });
