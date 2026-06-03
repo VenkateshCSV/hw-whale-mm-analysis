@@ -4,235 +4,141 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Whale PvP Matchmaking — Impact Analysis</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js">
-/* 9. Whale time spent */
-new Chart(document.getElementById('c_time_whale'), {
-  type: 'bar',
-  data: {
-    labels: ['Rookie','Challenger','Proven','Accomplished','Remarkable'],
-    datasets: [
-      { label: 'Pre', data: [58.1, 61.0, 67.5, 67.8, 78.4], backgroundColor: '#D85A30', borderRadius: 4 },
-      { label: 'Post', data: [57.1, 55.7, 61.3, 62.1, 71.2], backgroundColor: '#1D9E75', borderRadius: 4 }
-    ]
-  },
-  options: {
-    ...base,
-    plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y.toFixed(1)} mins` } } },
-    scales: {
-      x: { ...base.scales.x },
-      y: { ...base.scales.y, min: 40, max: 90, ticks: { ...base.scales.y.ticks, callback: v => v + ' m' } }
-    }
-  }
-});
-
-/* 10. Non-whale time spent */
-new Chart(document.getElementById('c_time_nonwhale'), {
-  type: 'bar',
-  data: {
-    labels: ['Rookie','Challenger','Proven','Accomplished','Remarkable'],
-    datasets: [
-      { label: 'Pre', data: [60.8, 59.1, 62.1, 64.3, 66.9], backgroundColor: '#D85A30', borderRadius: 4 },
-      { label: 'Post', data: [60.1, 56.7, 59.4, 60.6, 63.1], backgroundColor: '#85B7EB', borderRadius: 4 }
-    ]
-  },
-  options: {
-    ...base,
-    plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y.toFixed(1)} mins` } } },
-    scales: {
-      x: { ...base.scales.x },
-      y: { ...base.scales.y, min: 40, max: 90, ticks: { ...base.scales.y.ticks, callback: v => v + ' m' } }
-    }
-  }
-});
-</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=DM+Mono:wght@400;500&display=swap');
-
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
   :root {
-    --bg: #f7f6f3;
-    --surface: #ffffff;
-    --border: rgba(0,0,0,0.07);
-    --border-strong: rgba(0,0,0,0.13);
-    --text-primary: #1a1a1a;
-    --text-secondary: #5a5a5a;
-    --text-tertiary: #9a9a9a;
-    --teal: #1D9E75;
-    --teal-light: #E1F5EE;
-    --blue: #185FA5;
-    --blue-light: #E6F1FB;
-    --blue-mid: #378ADD;
-    --blue-bar: #85B7EB;
-    --amber: #BA7517;
-    --amber-light: #FAEEDA;
-    --coral: #D85A30;
-    --coral-light: #FAECE7;
-    --purple: #534AB7;
-    --green: #3B6D11;
-    --green-light: #EAF3DE;
-    --gray: #73726c;
-    --radius: 12px;
-    --radius-sm: 8px;
+    --bg: #f7f6f3; --surface: #ffffff; --border: rgba(0,0,0,0.07); --border-strong: rgba(0,0,0,0.13);
+    --text-primary: #1a1a1a; --text-secondary: #5a5a5a; --text-tertiary: #9a9a9a;
+    --teal: #1D9E75; --teal-light: #E1F5EE; --blue: #185FA5; --blue-light: #E6F1FB;
+    --blue-mid: #378ADD; --blue-bar: #85B7EB; --amber: #BA7517; --amber-light: #FAEEDA;
+    --coral: #D85A30; --coral-light: #FAECE7; --gray: #73726c; --green: #3B6D11; --green-light: #EAF3DE;
+    --radius: 12px; --radius-sm: 8px;
   }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text-primary); line-height: 1.6; }
 
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--bg);
-    color: var(--text-primary);
-    line-height: 1.6;
-  }
-
-  /* ── HEADER ── */
+  /* HEADER */
   header {
-    background: var(--surface);
-    border-bottom: 0.5px solid var(--border-strong);
-    padding: 1.4rem 3rem;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
+    background: var(--surface); border-bottom: 0.5px solid var(--border-strong);
+    padding: 1.1rem 2.5rem; position: sticky; top: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between; gap: 1rem;
   }
-  header .brand { display: flex; align-items: center; gap: 12px; }
-  header .brand .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--blue); }
-  header h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.01em; color: var(--text-primary); }
-  header .header-right { display: flex; align-items: center; gap: 1.5rem; }
-  header .meta { font-size: 11px; color: var(--text-tertiary); font-family: 'DM Mono', monospace; }
+  .brand { display: flex; align-items: center; gap: 10px; }
+  .brand .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--blue); flex-shrink: 0; }
+  .brand h1 { font-size: 14px; font-weight: 600; letter-spacing: -0.01em; }
+  .header-right { display: flex; align-items: center; gap: 12px; }
+  .meta { font-size: 11px; color: var(--text-tertiary); font-family: 'DM Mono', monospace; }
 
-  /* ── HERO ── */
-  .hero {
-    background: var(--surface);
-    border-bottom: 0.5px solid var(--border);
-    padding: 3rem 3rem 2.5rem;
+  /* TIMELINE DROPDOWN */
+  .timeline-select-wrap { position: relative; }
+  .timeline-select-wrap::after {
+    content: '▾'; position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+    font-size: 11px; color: var(--blue); pointer-events: none;
   }
-  .hero-eyebrow { font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-tertiary); font-family: 'DM Mono', monospace; margin-bottom: 0.6rem; }
-  .hero-title { font-size: 32px; font-weight: 600; letter-spacing: -0.03em; color: var(--text-primary); margin-bottom: 0.5rem; line-height: 1.2; }
-  .hero-desc { font-size: 15px; color: var(--text-secondary); max-width: 680px; line-height: 1.65; margin-bottom: 2rem; }
-
-  .kpi-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
-  .kpi-card { background: var(--bg); border: 0.5px solid var(--border-strong); border-radius: var(--radius-sm); padding: 1rem 1.1rem; }
-  .kpi-label { font-size: 12px; color: var(--text-tertiary); margin-bottom: 4px; }
-  .kpi-value { font-size: 22px; font-weight: 600; color: var(--text-primary); letter-spacing: -0.02em; }
-  .kpi-value.up { color: var(--teal); }
-  .kpi-value.down { color: var(--coral); }
-  .kpi-value.neutral { color: var(--blue); }
-  .kpi-note { font-size: 11px; color: var(--text-tertiary); margin-top: 2px; font-family: 'DM Mono', monospace; }
-
-  /* ── CAVEAT BANNER ── */
-  .caveat-banner {
-    background: var(--amber-light);
-    border-bottom: 0.5px solid rgba(186,117,23,0.2);
-    padding: 0.6rem 3rem;
-    font-size: 12px;
-    color: var(--amber);
-    font-family: 'DM Mono', monospace;
-    display: flex;
-    align-items: center;
-    gap: 8px;
+  #timelineSelect {
+    appearance: none; background: var(--blue-light); border: 0.5px solid var(--blue);
+    color: var(--blue); font-family: 'DM Mono', monospace; font-size: 12px; font-weight: 500;
+    padding: 6px 28px 6px 12px; border-radius: 6px; cursor: pointer; outline: none;
   }
+  #timelineSelect:hover { background: #d4e8f7; }
 
-  /* ── MAIN LAYOUT ── */
-  main { max-width: 1120px; margin: 0 auto; padding: 2.5rem 2rem 4rem; }
-
-  /* ── SECTION ── */
-  .section { margin-bottom: 3.5rem; }
-  .section-header { margin-bottom: 1.5rem; }
-  .section-num { font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-tertiary); font-family: 'DM Mono', monospace; margin-bottom: 0.3rem; }
-  .section-title { font-size: 20px; font-weight: 600; letter-spacing: -0.02em; color: var(--text-primary); margin-bottom: 0.25rem; }
-  .section-sub { font-size: 14px; color: var(--text-secondary); }
-
-  /* ── CARDS ── */
-  .card { background: var(--surface); border: 0.5px solid var(--border-strong); border-radius: var(--radius); padding: 1.5rem; }
-  .card-title { font-size: 13px; font-weight: 500; color: var(--text-secondary); margin-bottom: 1rem; padding-bottom: 8px; border-bottom: 0.5px solid var(--border); }
-  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
-  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.25rem; }
-  .full-col { display: grid; grid-template-columns: 1fr; gap: 1.25rem; }
-
-  /* ── CHART WRAPPER ── */
-  .chart-wrap { position: relative; width: 100%; }
-
-  /* ── LEGEND ── */
-  .legend { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 12px; }
-  .leg { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--text-secondary); }
-  .leg-sq { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
-  .leg-circ { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
-
-  /* ── INSIGHT BOXES ── */
-  .insights { display: flex; flex-direction: column; gap: 10px; }
-  .insight { border-left: 2.5px solid var(--blue-mid); background: #f9fbfe; border-radius: 0 var(--radius-sm) var(--radius-sm) 0; padding: 0.7rem 0.9rem; font-size: 13.5px; color: var(--text-primary); line-height: 1.55; }
-  .insight.warn { border-left-color: var(--amber); background: #fffbf4; }
-  .insight.good { border-left-color: var(--teal); background: #f4fbf8; }
-  .insight strong { font-weight: 600; }
-
-  /* ── COMPARISON TABLE ── */
-  .comp-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  .comp-table th {
-    font-size: 11px; font-weight: 500; color: var(--text-tertiary);
-    text-transform: uppercase; letter-spacing: 0.06em;
-    padding: 0 12px 10px 0; text-align: right;
-    border-bottom: 0.5px solid var(--border-strong);
-  }
-  .comp-table th:first-child { text-align: left; padding-left: 0; }
-  .comp-table th.pre  { color: var(--coral); }
-  .comp-table th.post { color: var(--teal); }
-  .comp-table th.delta { color: var(--blue); }
-  .comp-table td {
-    padding: 9px 12px 9px 0; border-bottom: 0.5px solid var(--border);
-    color: var(--text-primary); vertical-align: middle; text-align: right;
-    font-family: 'DM Mono', monospace; font-size: 12px;
-  }
-  .comp-table td:first-child { text-align: left; padding-left: 0; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; }
-  .comp-table tr:last-child td { border-bottom: none; }
-  .comp-table tr:hover td { background: var(--bg); }
-
-  .val-up   { color: var(--teal); font-weight: 500; }
-  .val-down { color: var(--coral); font-weight: 500; }
-  .val-muted { color: var(--text-tertiary); }
-
-  .delta-pill {
-    display: inline-block; padding: 1px 6px; border-radius: 4px;
-    font-size: 11px; font-weight: 500; font-family: 'DM Mono', monospace;
-  }
-  .delta-pill.up   { background: var(--teal-light); color: var(--teal); }
-  .delta-pill.down { background: var(--coral-light); color: var(--coral); }
-  .delta-pill.flat { background: var(--bg); color: var(--text-tertiary); }
-
-  /* ── RANK BADGES ── */
-  .rank-badge {
-    display: inline-block; padding: 2px 8px; border-radius: 5px;
-    font-size: 11px; font-weight: 500; font-family: 'DM Mono', monospace;
-  }
-  .rank-Rookie       { background: #E6F1FB; color: #185FA5; }
-  .rank-Challenger   { background: #E6F7FB; color: #1278A0; }
-  .rank-Proven       { background: var(--teal-light); color: #147055; }
-  .rank-Accomplished { background: var(--amber-light); color: var(--amber); }
-  .rank-Remarkable   { background: var(--coral-light); color: var(--coral); }
-
-  /* ── OPP GRID ── */
-  .opp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-  .opp-card { background: var(--surface); border: 0.5px solid var(--border-strong); border-radius: var(--radius); padding: 1.25rem 1.4rem; }
-  .opp-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; font-size: 16px; }
-  .opp-title { font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 6px; letter-spacing: -0.01em; }
-  .opp-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
-
-  /* ── FOOTER ── */
-  footer { text-align: center; padding: 2rem; font-size: 12px; color: var(--text-tertiary); border-top: 0.5px solid var(--border-strong); font-family: 'DM Mono', monospace; }
-  /* ── HEADER LINKS ── */
   header a.data-link {
-    font-size: 12px; font-weight: 500; color: var(--blue);
-    text-decoration: none; border: 0.5px solid var(--blue);
-    padding: 5px 14px; border-radius: 6px; transition: background 0.15s;
-    display: flex; align-items: center; gap: 6px;
+    font-size: 12px; font-weight: 500; color: var(--blue); text-decoration: none;
+    border: 0.5px solid var(--blue); padding: 5px 14px; border-radius: 6px;
+    transition: background 0.15s; display: flex; align-items: center; gap: 6px;
   }
   header a.data-link:hover { background: var(--blue-light); }
   header a.data-link svg { width: 13px; height: 13px; }
   header a.data-link.green { color: var(--teal); border-color: var(--teal); }
   header a.data-link.green:hover { background: var(--teal-light); }
+
+  /* CAVEAT */
+  .caveat-banner {
+    background: var(--amber-light); border-bottom: 0.5px solid rgba(186,117,23,0.2);
+    padding: 0.55rem 2.5rem; font-size: 12px; color: var(--amber);
+    font-family: 'DM Mono', monospace; display: flex; align-items: center; gap: 8px;
+  }
+
+  /* HERO */
+  .hero { background: var(--surface); border-bottom: 0.5px solid var(--border); padding: 2.5rem 2.5rem 2rem; }
+  .hero-eyebrow { font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-tertiary); font-family: 'DM Mono', monospace; margin-bottom: 0.5rem; }
+  .hero-title { font-size: 30px; font-weight: 600; letter-spacing: -0.03em; margin-bottom: 0.4rem; line-height: 1.2; }
+  .hero-desc { font-size: 14px; color: var(--text-secondary); max-width: 680px; line-height: 1.65; margin-bottom: 1.8rem; }
+  .kpi-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+  .kpi-card { background: var(--bg); border: 0.5px solid var(--border-strong); border-radius: var(--radius-sm); padding: 0.9rem 1rem; }
+  .kpi-label { font-size: 11px; color: var(--text-tertiary); margin-bottom: 3px; }
+  .kpi-value { font-size: 20px; font-weight: 600; color: var(--text-primary); letter-spacing: -0.02em; }
+  .kpi-value.up { color: var(--teal); }
+  .kpi-value.down { color: var(--coral); }
+  .kpi-value.neutral { color: var(--blue); }
+  .kpi-note { font-size: 11px; color: var(--text-tertiary); margin-top: 2px; font-family: 'DM Mono', monospace; }
+
+  /* MAIN */
+  main { max-width: 1120px; margin: 0 auto; padding: 2.5rem 2rem 4rem; }
+  .section { margin-bottom: 3.5rem; }
+  .section-header { margin-bottom: 1.4rem; }
+  .section-num { font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-tertiary); font-family: 'DM Mono', monospace; margin-bottom: 0.25rem; }
+  .section-title { font-size: 19px; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 0.2rem; }
+  .section-sub { font-size: 13.5px; color: var(--text-secondary); }
+
+  /* CARDS */
+  .card { background: var(--surface); border: 0.5px solid var(--border-strong); border-radius: var(--radius); padding: 1.4rem; }
+  .card-title { font-size: 12.5px; font-weight: 500; color: var(--text-secondary); margin-bottom: 1rem; padding-bottom: 8px; border-bottom: 0.5px solid var(--border); }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1.1rem; }
+  .chart-wrap { position: relative; width: 100%; }
+
+  /* LEGEND */
+  .legend { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 10px; }
+  .leg { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--text-secondary); }
+  .leg-sq { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+
+  /* INSIGHTS */
+  .insights { display: flex; flex-direction: column; gap: 9px; }
+  .insight { border-left: 2.5px solid var(--blue-mid); background: #f9fbfe; border-radius: 0 var(--radius-sm) var(--radius-sm) 0; padding: 0.65rem 0.9rem; font-size: 13.5px; color: var(--text-primary); line-height: 1.55; }
+  .insight.warn { border-left-color: var(--amber); background: #fffbf4; }
+  .insight.good { border-left-color: var(--teal); background: #f4fbf8; }
+  .insight strong { font-weight: 600; }
+
+  /* TABLES */
+  .comp-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .comp-table th { font-size: 11px; font-weight: 500; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.06em; padding: 0 10px 8px 0; text-align: right; border-bottom: 0.5px solid var(--border-strong); }
+  .comp-table th:first-child { text-align: left; padding-left: 0; }
+  .comp-table th.pre { color: var(--coral); }
+  .comp-table th.post { color: var(--teal); }
+  .comp-table th.delta { color: var(--blue); }
+  .comp-table td { padding: 8px 10px 8px 0; border-bottom: 0.5px solid var(--border); color: var(--text-primary); vertical-align: middle; text-align: right; font-family: 'DM Mono', monospace; font-size: 12px; }
+  .comp-table td:first-child { text-align: left; padding-left: 0; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; }
+  .comp-table tr:last-child td { border-bottom: none; }
+  .comp-table tr:hover td { background: var(--bg); }
+  .val-up { color: var(--teal); font-weight: 500; }
+  .val-down { color: var(--coral); font-weight: 500; }
+  .val-muted { color: var(--text-tertiary); }
+  .delta-pill { display: inline-block; padding: 1px 6px; border-radius: 4px; font-size: 11px; font-weight: 500; font-family: 'DM Mono', monospace; }
+  .delta-pill.up { background: var(--teal-light); color: var(--teal); }
+  .delta-pill.down { background: var(--coral-light); color: var(--coral); }
+  .delta-pill.flat { background: var(--bg); color: var(--text-tertiary); }
+
+  /* RANK BADGES */
+  .rank-badge { display: inline-block; padding: 2px 8px; border-radius: 5px; font-size: 11px; font-weight: 500; font-family: 'DM Mono', monospace; }
+  .rank-Rookie { background: #E6F1FB; color: #185FA5; }
+  .rank-Challenger { background: #E6F7FB; color: #1278A0; }
+  .rank-Proven { background: var(--teal-light); color: #147055; }
+  .rank-Accomplished { background: var(--amber-light); color: var(--amber); }
+  .rank-Remarkable { background: var(--coral-light); color: var(--coral); }
+
+  /* OPP GRID */
+  .opp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .opp-card { background: var(--surface); border: 0.5px solid var(--border-strong); border-radius: var(--radius); padding: 1.2rem 1.3rem; }
+  .opp-icon { width: 30px; height: 30px; border-radius: 7px; display: flex; align-items: center; justify-content: center; margin-bottom: 8px; font-size: 15px; }
+  .opp-title { font-size: 13.5px; font-weight: 600; color: var(--text-primary); margin-bottom: 5px; }
+  .opp-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+
+  /* HIDDEN */
+  .hidden { display: none !important; }
+
+  footer { text-align: center; padding: 2rem; font-size: 12px; color: var(--text-tertiary); border-top: 0.5px solid var(--border-strong); font-family: 'DM Mono', monospace; }
   footer a { color: var(--blue); text-decoration: none; }
-  footer a:hover { text-decoration: underline; }
 </style>
 </head>
 <body>
@@ -244,21 +150,27 @@ new Chart(document.getElementById('c_time_nonwhale'), {
     <h1>Whale PvP Matchmaking — Impact Analysis</h1>
   </div>
   <div class="header-right">
-    <span class="meta">Pre: May 24 · Post: May 31 · 1-day read</span>
+    <div class="timeline-select-wrap">
+      <select id="timelineSelect">
+        <option value="3day" selected>May 31 – Jun 2 (3-Day)</option>
+        <option value="day1">May 31 (Day 1)</option>
+      </select>
+    </div>
+    <span class="meta" id="compLabel">vs May 24–26</span>
     <a class="data-link" href="https://docs.google.com/document/d/1Jd7k8BmIg-NVPY3vZMu8PTCaXgU5gKpYyPi0Kf9XElc/edit?tab=t.0" target="_blank" rel="noopener">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
       PRD
     </a>
-    <a href="https://docs.google.com/spreadsheets/d/17fKDXQ-mEEVJAV6Bi7r8nn4vCA0CIZVifCcoU8CaxSw/edit?gid=0#gid=0" target="_blank" rel="noopener" class="data-link green">
+    <a class="data-link green" href="https://docs.google.com/spreadsheets/d/17fKDXQ-mEEVJAV6Bi7r8nn4vCA0CIZVifCcoU8CaxSw/edit?gid=0#gid=0" target="_blank" rel="noopener">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
       Data Sheet
     </a>
   </div>
 </header>
 
-<!-- CAVEAT BANNER -->
-<div class="caveat-banner">
-  ⚠ Early read — 1 day post-change only. All signals are directional. Continue monitoring for stabilisation over the next 7 days.
+<!-- CAVEAT -->
+<div class="caveat-banner" id="caveatBanner">
+  ⚠ <span id="caveatText">3-day post-change read (May 31 – Jun 2) vs May 24–26. Signals are stabilising but continue monitoring.</span>
 </div>
 
 <!-- HERO -->
@@ -266,640 +178,620 @@ new Chart(document.getElementById('c_time_nonwhale'), {
   <p class="hero-eyebrow">Game Analytics · PvP Matchmaking</p>
   <h2 class="hero-title">Whale Matchmaking<br>Impact Analysis</h2>
   <p class="hero-desc">
-    Evaluating the effect of power-band matchmaking (Option 2) on eligible whale win rates, opponent experience, and engagement mode shift.
+    Evaluating the effect of power-band matchmaking (Option 2) on eligible whale win rates, self-quit behaviour, engagement mode shift, and next-day retention.
     Eligible whales = users whose Top 11 team strength exceeds the Q90 threshold for their reputation rank. Scope: Rookie → Remarkable.
   </p>
-  <div class="kpi-row">
-    <div class="kpi-card">
-      <p class="kpi-label">Whale real-user WR avg</p>
-      <p class="kpi-value up">+26pp</p>
-      <p class="kpi-note">41% → 67% across ranks</p>
-    </div>
-    <div class="kpi-card">
-      <p class="kpi-label">Whale PRatio (real users)</p>
-      <p class="kpi-value down">0.86</p>
-      <p class="kki-note" style="font-size:11px;color:var(--text-tertiary);margin-top:2px;font-family:'DM Mono',monospace;">was 0.99 · opponents weaker ✓</p>
-    </div>
-    <div class="kpi-card">
-      <p class="kpi-label">Non-whale PRatio</p>
-      <p class="kpi-value neutral">1.01</p>
-      <p class="kpi-note">unchanged · change is surgical</p>
-    </div>
-    <div class="kpi-card">
-      <p class="kpi-label">Whale opp quit rate</p>
-      <p class="kpi-value down">~2×</p>
-      <p class="kpi-note">expected · weaker opps forfeit</p>
-    </div>
-    <div class="kpi-card">
-      <p class="kpi-label">Whale league adoption</p>
-      <p class="kpi-value down">−10pp avg</p>
-      <p class="kpi-note">shifting to PvP as intended</p>
-    </div>
+  <div class="kpi-row" id="kpiRow">
+    <!-- injected by JS -->
   </div>
 </section>
 
-<!-- MAIN -->
 <main>
 
-  <!-- ── SECTION 1: ELIGIBLE BASE ── -->
+  <!-- S1: ELIGIBLE BASE -->
   <div class="section">
     <div class="section-header">
       <p class="section-num">01 — Eligible base</p>
       <p class="section-title">Who are the eligible whales?</p>
-      <p class="section-sub">Users whose Top 11 team strength exceeds the Q90 threshold for their reputation rank. Stable week-over-week — no composition shift between comparison dates.</p>
+      <p class="section-sub">Users whose Top 11 strength exceeds the Q90 threshold for their rep rank. Stable across both windows — no meaningful composition shift.</p>
     </div>
-    <div class="two-col" style="margin-bottom:1.25rem;">
+    <div class="two-col" style="margin-bottom:1.1rem;">
       <div class="card">
-        <p class="card-title">Eligible whale count by rank — May 31 (Post)</p>
-        <div class="chart-wrap" style="height:220px;">
-          <canvas id="c_base_post"></canvas>
-        </div>
+        <p class="card-title">Eligible whale count by rank — Post window</p>
+        <div class="chart-wrap" style="height:210px;"><canvas id="c_base_post"></canvas></div>
       </div>
       <div class="card">
         <p class="card-title">% of rank population that are eligible whales</p>
         <div class="legend">
-          <span class="leg"><span class="leg-sq" style="background:var(--coral)"></span>Pre (May 24)</span>
-          <span class="leg"><span class="leg-sq" style="background:var(--teal)"></span>Post (May 31)</span>
+          <span class="leg"><span class="leg-sq" style="background:var(--coral)"></span>Pre</span>
+          <span class="leg"><span class="leg-sq" style="background:var(--teal)"></span>Post</span>
         </div>
-        <div class="chart-wrap" style="height:220px;">
-          <canvas id="c_base_pct"></canvas>
-        </div>
+        <div class="chart-wrap" style="height:210px;"><canvas id="c_base_pct"></canvas></div>
       </div>
     </div>
-    <div class="insights">
-      <div class="insight"><strong>Eligible base is stable week-over-week</strong> — whale % per rank shifted by ≤0.4pp. There is no meaningful composition change between comparison dates, so pre/post differences in performance metrics are attributable to the matchmaking change, not a different mix of users.</div>
-    </div>
+    <div class="insights" id="ins_base"></div>
   </div>
 
-  <!-- ── SECTION 2: MECHANISM CHECK ── -->
+  <!-- S2: MECHANISM CHECK -->
   <div class="section">
     <div class="section-header">
       <p class="section-num">02 — Mechanism check</p>
       <p class="section-title">Is the power band placing weaker opponents?</p>
-      <p class="section-sub">Average opp_top11 / top11 against real users only. A PRatio below 1.0 means the opponent is weaker than the whale. The change should move whale PRatio down without affecting non-whales.</p>
+      <p class="section-sub">Average opp_top11 / top11 against real users only. PRatio below 1.0 = opponent is weaker. Non-whale PRatio should remain ~1.0.</p>
     </div>
-    <div class="two-col" style="margin-bottom:1.25rem;">
+    <div class="two-col" style="margin-bottom:1.1rem;">
       <div class="card">
-        <p class="card-title">Whale average PRatio (real users) — Pre vs Post</p>
+        <p class="card-title">Whale average PRatio — Pre vs Post</p>
         <div class="legend">
-          <span class="leg"><span class="leg-sq" style="background:var(--coral)"></span>Pre (May 24)</span>
-          <span class="leg"><span class="leg-sq" style="background:var(--teal)"></span>Post (May 31)</span>
+          <span class="leg"><span class="leg-sq" style="background:var(--coral)"></span>Pre</span>
+          <span class="leg"><span class="leg-sq" style="background:var(--teal)"></span>Post</span>
         </div>
-        <div class="chart-wrap" style="height:240px;">
-          <canvas id="c_pratio_whale"></canvas>
-        </div>
+        <div class="chart-wrap" style="height:230px;"><canvas id="c_pratio_whale"></canvas></div>
       </div>
       <div class="card">
-        <p class="card-title">Non-whale average PRatio — stability check</p>
+        <p class="card-title">Non-whale PRatio — stability check</p>
         <div class="legend">
-          <span class="leg"><span class="leg-sq" style="background:var(--coral)"></span>Pre (May 24)</span>
-          <span class="leg"><span class="leg-sq" style="background:var(--blue-bar)"></span>Post (May 31)</span>
+          <span class="leg"><span class="leg-sq" style="background:var(--coral)"></span>Pre</span>
+          <span class="leg"><span class="leg-sq" style="background:var(--blue-bar)"></span>Post</span>
         </div>
-        <div class="chart-wrap" style="height:240px;">
-          <canvas id="c_pratio_nonwhale"></canvas>
-        </div>
+        <div class="chart-wrap" style="height:230px;"><canvas id="c_pratio_nonwhale"></canvas></div>
       </div>
     </div>
-    <div class="insights">
-      <div class="insight good"><strong>Power band is working.</strong> Whale PRatio dropped from ~0.99 → 0.84–0.88 across all ranks. Opponents are now meaningfully weaker relative to the whale's team strength.</div>
-      <div class="insight good"><strong>Non-whale pool unaffected.</strong> Non-whale PRatio held at ~1.01 both pre and post. The matchmaking change is surgical — it did not distort the normal population's opponent quality.</div>
-    </div>
+    <div class="insights" id="ins_pratio"></div>
   </div>
 
-  <!-- ── SECTION 3: WIN RATE ── -->
+  <!-- S3: WIN RATE -->
   <div class="section">
     <div class="section-header">
       <p class="section-num">03 — Win rate</p>
       <p class="section-title">Real-user win rate is the primary success metric</p>
-      <p class="section-sub">All-match WR includes bot wins and is inflated by the new bot mechanic. Real-user WR strips bots out and shows true competitive performance. Min 3 matches played to be included.</p>
+      <p class="section-sub">Real-user WR strips bot wins out. All-match WR is inflated by the bot mechanic. Min 3 matches played to be included.</p>
     </div>
-    <div class="card" style="margin-bottom:1.25rem;">
-      <p class="card-title">Whale real-user win rate — Pre vs Post</p>
+    <div class="card" style="margin-bottom:1.1rem;">
+      <p class="card-title">Whale win rate — All Matches vs Real User, Pre vs Post</p>
       <div class="legend">
-        <span class="leg"><span class="leg-sq" style="background:var(--coral)"></span>Pre (May 24)</span>
-        <span class="leg"><span class="leg-sq" style="background:var(--teal)"></span>Post (May 31)</span>
+        <span class="leg"><span class="leg-sq" style="background:rgba(216,90,48,0.35)"></span>Pre — All Matches</span>
+        <span class="leg"><span class="leg-sq" style="background:var(--coral)"></span>Pre — Real-User</span>
+        <span class="leg"><span class="leg-sq" style="background:rgba(29,158,117,0.35)"></span>Post — All Matches</span>
+        <span class="leg"><span class="leg-sq" style="background:var(--teal)"></span>Post — Real-User</span>
       </div>
-      <div class="chart-wrap" style="height:260px;">
-        <canvas id="c_wr_whale"></canvas>
-      </div>
+      <div class="chart-wrap" style="height:250px;"><canvas id="c_wr_whale"></canvas></div>
     </div>
-    <div class="two-col" style="margin-bottom:1.25rem;">
+    <div class="two-col" style="margin-bottom:1.1rem;">
       <div class="card">
-        <p class="card-title">Win rate comparison — all ranks</p>
-        <table class="comp-table">
-          <thead>
-            <tr>
-              <th>Rank</th>
-              <th colspan="3" style="text-align:center;padding-bottom:4px;">All Matches WR</th>
-              <th colspan="3" style="text-align:center;padding-bottom:4px;">Real-User WR ★</th>
-            </tr>
-            <tr>
-              <th></th>
-              <th class="pre">Pre</th>
-              <th class="post">Post</th>
-              <th class="delta">Δ</th>
-              <th class="pre">Pre</th>
-              <th class="post">Post</th>
-              <th class="delta">Δ</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><span class="rank-badge rank-Rookie">Rookie</span></td>
-              <td class="val-muted">64.8%</td><td class="val-up">76.2%</td><td><span class="delta-pill up">+11.4pp</span></td>
-              <td class="val-down">41.1%</td><td class="val-up">68.3%</td><td><span class="delta-pill up">+27.2pp</span></td>
-            </tr>
-            <tr>
-              <td><span class="rank-badge rank-Challenger">Challenger</span></td>
-              <td class="val-muted">62.0%</td><td class="val-up">70.9%</td><td><span class="delta-pill up">+8.9pp</span></td>
-              <td class="val-down">44.7%</td><td class="val-up">64.3%</td><td><span class="delta-pill up">+19.6pp</span></td>
-            </tr>
-            <tr>
-              <td><span class="rank-badge rank-Proven">Proven</span></td>
-              <td class="val-muted">62.1%</td><td class="val-up">73.4%</td><td><span class="delta-pill up">+11.3pp</span></td>
-              <td class="val-down">43.3%</td><td class="val-up">66.4%</td><td><span class="delta-pill up">+23.1pp</span></td>
-            </tr>
-            <tr>
-              <td><span class="rank-badge rank-Accomplished">Accomplished</span></td>
-              <td class="val-muted">62.8%</td><td class="val-up">76.1%</td><td><span class="delta-pill up">+13.3pp</span></td>
-              <td class="val-down">44.9%</td><td class="val-up">70.9%</td><td><span class="delta-pill up">+26.0pp</span></td>
-            </tr>
-            <tr>
-              <td><span class="rank-badge rank-Remarkable">Remarkable</span></td>
-              <td class="val-muted">54.6%</td><td class="val-up">71.1%</td><td><span class="delta-pill up">+16.5pp</span></td>
-              <td class="val-down">48.1%</td><td class="val-up">69.1%</td><td><span class="delta-pill up">+21.0pp</span></td>
-            </tr>
-          </tbody>
-        </table>
+        <p class="card-title">Win rate breakdown — all ranks</p>
+        <table class="comp-table" id="tbl_wr"></table>
       </div>
-      <div class="card" style="display:flex;flex-direction:column;justify-content:center;gap:10px;">
-        <div class="insights">
-          <div class="insight warn"><strong>Pre-change: whales were losing to real users across every rank.</strong> Real-user WR was 41–48%, sub-50%. Whales were being punished for spending — their team strength attracted experienced opponents, not weaker ones.</div>
-          <div class="insight good"><strong>Post-change: consistent 19–27pp gain across all ranks.</strong> Real-user WR is now 64–71%. The largest jump is Rookie (+27.2pp), where the D3 whale problem was most acute and the power gap to the median user was widest.</div>
-          <div class="insight"><strong>Non-whale WR unchanged.</strong> Non-whale all-match WR was 55–65% pre and remains similar post. The improved whale WR is not coming at the cost of the broader population's experience.</div>
-        </div>
+      <div class="card" style="display:flex;flex-direction:column;justify-content:center;">
+        <div class="insights" id="ins_wr"></div>
       </div>
     </div>
   </div>
 
-  <!-- ── SECTION 4: QUIT RATE ── -->
+  <!-- S4: QUIT RATE -->
   <div class="section">
     <div class="section-header">
-      <p class="section-num">04 — Opponent quit rate</p>
-      <p class="section-title">Quit rate rose for whales — expected, but needs monitoring</p>
-      <p class="section-sub">% of real-user matches where the opponent quit from the menu (intentional forfeits only — disconnects not captured). Captures perceived unfairness by the weaker side when matched against a whale.</p>
+      <p class="section-num">04 — Quit rate</p>
+      <p class="section-title">Opponents quit more — whales quit less</p>
+      <p class="section-sub">Opponent quit = weaker user forfeiting on seeing the mismatch (expected). Self-quit = whale quitting their own match (was a pain signal pre-change). Intentional forfeits only — disconnects not captured.</p>
     </div>
-    <div class="two-col" style="margin-bottom:1.25rem;">
+    <div class="two-col" style="margin-bottom:1.1rem;">
       <div class="card">
-        <p class="card-title">Whale opponent quit rate — Pre vs Post</p>
+        <p class="card-title">Opponent quit rate — Whales</p>
         <div class="legend">
-          <span class="leg"><span class="leg-sq" style="background:var(--coral)"></span>Pre (May 24)</span>
-          <span class="leg"><span class="leg-sq" style="background:var(--amber)"></span>Post (May 31)</span>
+          <span class="leg"><span class="leg-sq" style="background:var(--coral)"></span>Pre</span>
+          <span class="leg"><span class="leg-sq" style="background:var(--amber)"></span>Post</span>
         </div>
-        <div class="chart-wrap" style="height:240px;">
-          <canvas id="c_quit_whale"></canvas>
-        </div>
+        <div class="chart-wrap" style="height:210px;"><canvas id="c_quit_opp_whale"></canvas></div>
       </div>
       <div class="card">
-        <p class="card-title">Non-whale opponent quit rate — stability check</p>
+        <p class="card-title">Opponent quit rate — Non-Whales</p>
         <div class="legend">
-          <span class="leg"><span class="leg-sq" style="background:var(--coral)"></span>Pre (May 24)</span>
-          <span class="leg"><span class="leg-sq" style="background:var(--blue-bar)"></span>Post (May 31)</span>
+          <span class="leg"><span class="leg-sq" style="background:var(--coral)"></span>Pre</span>
+          <span class="leg"><span class="leg-sq" style="background:var(--blue-bar)"></span>Post</span>
         </div>
-        <div class="chart-wrap" style="height:240px;">
-          <canvas id="c_quit_nonwhale"></canvas>
-        </div>
+        <div class="chart-wrap" style="height:210px;"><canvas id="c_quit_opp_nw"></canvas></div>
       </div>
     </div>
-    <div class="insights">
-      <div class="insight warn"><strong>Quit rate roughly doubled for whales at higher ranks</strong> — Accomplished and Remarkable whales see ~16% quit rate (was ~7–8%). This is expected: the weaker opponent placed in front of a whale sees the team strength gap and forfeits. Not a failure signal on its own.</div>
-      <div class="insight"><strong>Non-whale quit rate is flat</strong> — confirming the quit spike is specific to the whale matchmaking change and not a platform-wide behaviour shift.</div>
-      <div class="insight warn"><strong>Watch: does quit rate stabilise?</strong> Opponents who encounter and quit against whales repeatedly may churn from PvP. The same-day cooldown should dampen repeated exposure — verify this protection is triggering correctly at Accomplished and Remarkable where quit rates are highest.</div>
+    <div class="two-col" id="selfquit_row" style="margin-bottom:1.1rem;">
+      <div class="card">
+        <p class="card-title">Self-quit rate — Whales <span style="font-size:10px;color:var(--teal);background:var(--teal-light);padding:1px 6px;border-radius:4px;margin-left:4px;">3-day only</span></p>
+        <div class="legend">
+          <span class="leg"><span class="leg-sq" style="background:var(--coral)"></span>Pre</span>
+          <span class="leg"><span class="leg-sq" style="background:var(--teal)"></span>Post</span>
+        </div>
+        <div class="chart-wrap" style="height:210px;"><canvas id="c_quit_self_whale"></canvas></div>
+      </div>
+      <div class="card">
+        <p class="card-title">Self-quit rate — Non-Whales <span style="font-size:10px;color:var(--teal);background:var(--teal-light);padding:1px 6px;border-radius:4px;margin-left:4px;">3-day only</span></p>
+        <div class="legend">
+          <span class="leg"><span class="leg-sq" style="background:var(--coral)"></span>Pre</span>
+          <span class="leg"><span class="leg-sq" style="background:var(--blue-bar)"></span>Post</span>
+        </div>
+        <div class="chart-wrap" style="height:210px;"><canvas id="c_quit_self_nw"></canvas></div>
+      </div>
     </div>
+    <div class="insights" id="ins_quit"></div>
   </div>
 
-  <!-- ── SECTION 5: ENGAGEMENT SHIFT ── -->
+  <!-- S5: ENGAGEMENT SHIFT -->
   <div class="section">
     <div class="section-header">
       <p class="section-num">05 — Engagement shift</p>
       <p class="section-title">Whales are moving from League back to PvP</p>
-      <p class="section-sub">
-        Pre-change, whales were refugeeing into League (Ladder) matches where their win rates were better, because PvP was unwinnable against experienced opponents.
-        The intended outcome of this change is to make PvP rewarding enough that whales prefer it over League.
-      </p>
+      <p class="section-sub">Pre-change, whales refugeed into League where winrates were better. The intended outcome is to make PvP rewarding enough that they return to it.</p>
     </div>
-    <div class="card" style="margin-bottom:1.25rem;">
-      <p class="card-title">League adoption % — Whales vs Non-Whales, Pre vs Post</p>
+    <div class="card" style="margin-bottom:1.1rem;">
+      <p class="card-title">League adoption % — Whale vs Non-Whale, Pre vs Post</p>
       <div class="legend">
         <span class="leg"><span class="leg-sq" style="background:#D4A017"></span>Whale Pre</span>
         <span class="leg"><span class="leg-sq" style="background:var(--amber)"></span>Whale Post</span>
         <span class="leg"><span class="leg-sq" style="background:var(--blue-bar)"></span>Non-Whale Pre</span>
         <span class="leg"><span class="leg-sq" style="background:var(--blue)"></span>Non-Whale Post</span>
       </div>
-      <div class="chart-wrap" style="height:260px;">
-        <canvas id="c_league_adopt"></canvas>
-      </div>
+      <div class="chart-wrap" style="height:250px;"><canvas id="c_league"></canvas></div>
     </div>
-    <div class="two-col" style="margin-bottom:1.25rem;">
+    <div class="two-col" style="margin-bottom:1.1rem;">
       <div class="card">
-        <p class="card-title">League adoption & match counts — Whales</p>
-        <table class="comp-table">
-          <thead>
-            <tr>
-              <th>Rank</th>
-              <th colspan="3" style="text-align:center;padding-bottom:4px;">League Adoption %</th>
-              <th colspan="2" style="text-align:center;padding-bottom:4px;">League Matches/Day</th>
-              <th colspan="2" style="text-align:center;padding-bottom:4px;">PvP Matches/Day</th>
-            </tr>
-            <tr>
-              <th></th>
-              <th class="pre">Pre</th><th class="post">Post</th><th class="delta">Δ</th>
-              <th class="pre">Pre</th><th class="post">Post</th>
-              <th class="pre">Pre</th><th class="post">Post</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><span class="rank-badge rank-Rookie">Rookie</span></td>
-              <td>65.2%</td><td class="val-down">63.3%</td><td><span class="delta-pill down">−1.9pp</span></td>
-              <td>3.1</td><td class="val-down">2.8</td>
-              <td>3.9</td><td class="val-up">4.1</td>
-            </tr>
-            <tr>
-              <td><span class="rank-badge rank-Challenger">Challenger</span></td>
-              <td>67.2%</td><td class="val-down">59.6%</td><td><span class="delta-pill down">−7.6pp</span></td>
-              <td>3.1</td><td class="val-down">2.7</td>
-              <td>3.9</td><td class="val-up">4.0</td>
-            </tr>
-            <tr>
-              <td><span class="rank-badge rank-Proven">Proven</span></td>
-              <td>68.9%</td><td class="val-down">57.1%</td><td><span class="delta-pill down">−11.8pp</span></td>
-              <td>3.3</td><td class="val-down">2.9</td>
-              <td>4.5</td><td class="val-down">4.4</td>
-            </tr>
-            <tr>
-              <td><span class="rank-badge rank-Accomplished">Accomplished</span></td>
-              <td>68.5%</td><td class="val-down">54.2%</td><td><span class="delta-pill down">−14.3pp</span></td>
-              <td>3.4</td><td class="val-down">2.9</td>
-              <td>5.1</td><td>5.1</td>
-            </tr>
-            <tr>
-              <td><span class="rank-badge rank-Remarkable">Remarkable</span></td>
-              <td>69.7%</td><td class="val-down">49.8%</td><td><span class="delta-pill down">−19.9pp</span></td>
-              <td>3.7</td><td class="val-down">2.9</td>
-              <td>5.0</td><td class="val-up">5.7</td>
-            </tr>
-          </tbody>
-        </table>
+        <p class="card-title">League & PvP matches/day — Whales</p>
+        <table class="comp-table" id="tbl_matches"></table>
       </div>
-      <div class="card" style="display:flex;flex-direction:column;justify-content:center;gap:10px;">
-        <div class="insights">
-          <div class="insight good"><strong>Engagement shift confirmed.</strong> Whale League adoption fell 2–20pp across ranks (largest at Remarkable: −19.9pp). Whale League matches/day dropped 0.3–0.8 across all ranks. Whales are responding to a better PvP experience by playing more PvP.</div>
-          <div class="insight good"><strong>Remarkable shows the strongest shift.</strong> At 69.7% → 49.8% League adoption, this is the rank where whales were most deeply refugeeing into League. The improvement in PvP win rates here (+21pp real-user WR) is creating the pull.</div>
-          <div class="insight warn"><strong>Non-whale League adoption also dipped at higher ranks</strong> (Accomplished −6.8pp, Remarkable −11.0pp). This may be correlated — non-whales who are matched against whales, quit, and disengage from PvP may also reduce League activity. Separate this from an organic day-of-week trend before drawing conclusions.</div>
-        </div>
+      <div class="card" style="display:flex;flex-direction:column;justify-content:center;">
+        <div class="insights" id="ins_engagement"></div>
       </div>
     </div>
   </div>
 
-  <!-- ── SECTION 6: TIME SPENT ── -->
+  <!-- S6: NDR -->
+  <div class="section" id="ndr_section">
+    <div class="section-header">
+      <p class="section-num">06 — Next-day retention (PvP)</p>
+      <p class="section-title">Whale PvP retention improved post-change</p>
+      <p class="section-sub">% of users who return to play PvP the next day. Whale NDR is now above non-whale at every rank except Remarkable.</p>
+    </div>
+    <div class="two-col" style="margin-bottom:1.1rem;">
+      <div class="card">
+        <p class="card-title">NDR% by rank — Whales, Pre vs Post</p>
+        <div class="legend">
+          <span class="leg"><span class="leg-sq" style="background:var(--coral)"></span>Pre</span>
+          <span class="leg"><span class="leg-sq" style="background:var(--teal)"></span>Post</span>
+        </div>
+        <div class="chart-wrap" style="height:230px;"><canvas id="c_ndr_whale"></canvas></div>
+      </div>
+      <div class="card">
+        <p class="card-title">NDR% by rank — Non-Whales, Pre vs Post</p>
+        <div class="legend">
+          <span class="leg"><span class="leg-sq" style="background:var(--coral)"></span>Pre</span>
+          <span class="leg"><span class="leg-sq" style="background:var(--blue-bar)"></span>Post</span>
+        </div>
+        <div class="chart-wrap" style="height:230px;"><canvas id="c_ndr_nonwhale"></canvas></div>
+      </div>
+    </div>
+    <div class="insights" id="ins_ndr"></div>
+  </div>
+
+  <!-- S7: TIME SPENT -->
   <div class="section">
     <div class="section-header">
-      <p class="section-num">06 — Time spent</p>
-      <p class="section-title">Session time is down slightly for whales — worth monitoring</p>
-      <p class="section-sub">Average daily time spent in-game (mins), split by rank. Pre-change whales at higher ranks were spending significantly more time — likely driven by more matches played to grind through harder opponents. Post-change the drop is modest but directionally consistent.</p>
+      <p class="section-num" id="timespent_num">07 — Time spent</p>
+      <p class="section-title">Session time is broadly stable — slight uptick at higher ranks</p>
+      <p class="section-sub">Average daily time spent in-game (mins) by rank. The Day 1 dip has largely reversed in the 3-day window.</p>
     </div>
-    <div class="two-col" style="margin-bottom:1.25rem;">
+    <div class="two-col" style="margin-bottom:1.1rem;">
       <div class="card">
         <p class="card-title">Avg. time spent (mins) — Whale, Pre vs Post</p>
         <div class="legend">
-          <span class="leg"><span class="leg-sq" style="background:var(--coral)"></span>Pre (May 24)</span>
-          <span class="leg"><span class="leg-sq" style="background:var(--teal)"></span>Post (May 31)</span>
+          <span class="leg"><span class="leg-sq" style="background:var(--coral)"></span>Pre</span>
+          <span class="leg"><span class="leg-sq" style="background:var(--teal)"></span>Post</span>
         </div>
-        <div class="chart-wrap" style="height:240px;">
-          <canvas id="c_time_whale"></canvas>
-        </div>
+        <div class="chart-wrap" style="height:230px;"><canvas id="c_time_whale"></canvas></div>
       </div>
       <div class="card">
         <p class="card-title">Avg. time spent (mins) — Non-Whale, Pre vs Post</p>
         <div class="legend">
-          <span class="leg"><span class="leg-sq" style="background:var(--coral)"></span>Pre (May 24)</span>
-          <span class="leg"><span class="leg-sq" style="background:var(--blue-bar)"></span>Post (May 31)</span>
+          <span class="leg"><span class="leg-sq" style="background:var(--coral)"></span>Pre</span>
+          <span class="leg"><span class="leg-sq" style="background:var(--blue-bar)"></span>Post</span>
         </div>
-        <div class="chart-wrap" style="height:240px;">
-          <canvas id="c_time_nonwhale"></canvas>
-        </div>
+        <div class="chart-wrap" style="height:230px;"><canvas id="c_time_nonwhale"></canvas></div>
       </div>
     </div>
-    <div class="card" style="margin-bottom:1.25rem;">
-      <p class="card-title">Avg. time spent (mins) — full breakdown</p>
-      <table class="comp-table">
-        <thead>
-          <tr>
-            <th>Rank</th>
-            <th colspan="3" style="text-align:center;padding-bottom:4px;">Whale</th>
-            <th colspan="3" style="text-align:center;padding-bottom:4px;">Non-Whale</th>
-          </tr>
-          <tr>
-            <th></th>
-            <th class="pre">Pre</th><th class="post">Post</th><th class="delta">Δ</th>
-            <th class="pre">Pre</th><th class="post">Post</th><th class="delta">Δ</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><span class="rank-badge rank-Rookie">Rookie</span></td>
-            <td>58.1</td><td class="val-down">57.1</td><td><span class="delta-pill down">−1.0</span></td>
-            <td>60.8</td><td class="val-down">60.1</td><td><span class="delta-pill down">−0.7</span></td>
-          </tr>
-          <tr>
-            <td><span class="rank-badge rank-Challenger">Challenger</span></td>
-            <td>61.0</td><td class="val-down">55.7</td><td><span class="delta-pill down">−5.3</span></td>
-            <td>59.1</td><td class="val-down">56.7</td><td><span class="delta-pill down">−2.4</span></td>
-          </tr>
-          <tr>
-            <td><span class="rank-badge rank-Proven">Proven</span></td>
-            <td>67.5</td><td class="val-down">61.3</td><td><span class="delta-pill down">−6.2</span></td>
-            <td>62.1</td><td class="val-down">59.4</td><td><span class="delta-pill down">−2.7</span></td>
-          </tr>
-          <tr>
-            <td><span class="rank-badge rank-Accomplished">Accomplished</span></td>
-            <td>67.8</td><td class="val-down">62.1</td><td><span class="delta-pill down">−5.7</span></td>
-            <td>64.3</td><td class="val-down">60.6</td><td><span class="delta-pill down">−3.7</span></td>
-          </tr>
-          <tr>
-            <td><span class="rank-badge rank-Remarkable">Remarkable</span></td>
-            <td>78.4</td><td class="val-down">71.2</td><td><span class="delta-pill down">−7.2</span></td>
-            <td>66.9</td><td class="val-down">63.1</td><td><span class="delta-pill down">−3.8</span></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <div class="insights">
-      <div class="insight warn"><strong>Whale time spent is down 1–7 mins across all ranks.</strong> The drop is largest at Remarkable (−7.2 mins) and Proven (−6.2 mins). Pre-change, whales at higher ranks were likely grinding more matches to fight through harder opponents — inflating time spent. Post-change, easier wins may mean matches resolve faster, pulling the average down.</div>
-      <div class="insight"><strong>Non-whale time spent also dipped slightly (−0.7 to −3.8 mins).</strong> The non-whale drop mirrors the whale trend, which suggests this may partly be a day-level or platform-level effect rather than purely driven by the matchmaking change. Worth separating before drawing conclusions.</div>
-      <div class="insight warn"><strong>Monitor over the next 7 days.</strong> If time spent continues declining for whales specifically, it may indicate the new match format (quick wins, more quits) is reducing session depth. The key question is whether PvP matches/day compensates — a shorter but more frequent session pattern would still be healthy.</div>
-    </div>
+    <div class="insights" id="ins_time"></div>
   </div>
 
-  <!-- ── SECTION 7: OPEN QUESTIONS ── -->
+  <!-- S8: WHALES FACED -->
+  <div class="section" id="whalesfaced_section">
+    <div class="section-header">
+      <p class="section-num">08 — Whales faced by non-whales</p>
+      <p class="section-title">Non-whale exposure to Q90 whales — is a same-day cooldown needed?</p>
+      <p class="section-sub">Distribution of how many eligible whales a non-whale user faces per day. Input for deciding urgency of the same-day cooldown (not yet shipped).</p>
+    </div>
+    <div class="card" style="margin-bottom:1.1rem;">
+      <p class="card-title">Non-whale users: whales faced per day — Post window distribution</p>
+      <div class="chart-wrap" style="height:230px;"><canvas id="c_whalesfaced"></canvas></div>
+    </div>
+    <div class="insights" id="ins_whalesfaced"></div>
+  </div>
+
+  <!-- S9: OPEN QUESTIONS -->
   <div class="section">
     <div class="section-header">
-      <p class="section-num">07 — Open questions</p>
-      <p class="section-title">What to track as more post-change data accumulates</p>
-      <p class="section-sub">With only 1 day of data, these are the signals to watch over the next 7–14 days before drawing final conclusions.</p>
+      <p class="section-num" id="openq_num">09 — Open questions</p>
+      <p class="section-title">What to track going forward</p>
+      <p class="section-sub">With 3 days of data, signals are stabilising. These are the remaining watch items.</p>
     </div>
-    <div class="opp-grid">
-      <div class="opp-card">
-        <div class="opp-icon" style="background:var(--blue-light);">📊</div>
-        <p class="opp-title">Win streak reversion rate</p>
-        <p class="opp-desc">How often are whales hitting the ≥4 win streak threshold and reverting to normal matchmaking? If most whales never reach this, the reversion logic is largely inactive and the power band stays on indefinitely — which may inflate WR beyond what's healthy for the ecosystem.</p>
-      </div>
-      <div class="opp-card">
-        <div class="opp-icon" style="background:var(--coral-light);">📉</div>
-        <p class="opp-title">Weaker-opponent churn signal</p>
-        <p class="opp-desc">Non-whales who are matched against Q90 whales and quit — are they churning from PvP? The same-day cooldown should protect them from repeated exposure, but D3 and D7 retention for this sub-segment should be tracked to confirm the protection is working.</p>
-      </div>
-      <div class="opp-card">
-        <div class="opp-icon" style="background:var(--teal-light);">💰</div>
-        <p class="opp-title">Monetisation conversion</p>
-        <p class="opp-desc">Does a better PvP experience convert into spend? LTV and purchase frequency for eligible whales post-change vs. a matched pre-change cohort over a 7-day window. The hypothesis is that winning feels good → more engagement → more spend.</p>
-      </div>
-      <div class="opp-card">
-        <div class="opp-icon" style="background:var(--amber-light);">🏆</div>
-        <p class="opp-title">Rank progression speed</p>
-        <p class="opp-desc">Higher win rates mean faster rank-ups. Are whales now progressing through reputation ranks faster? If so, does that push them out of their current Q90-eligible range and into a rank where they're no longer eligible — making the system partially self-correcting?</p>
-      </div>
-    </div>
+    <div class="opp-grid" id="openq_grid"></div>
   </div>
 
 </main>
 
 <footer>
   Hitwicket Superstars · Internal Analytics · June 2026 &nbsp;·&nbsp;
-  Comparison: May 24 (pre) vs May 31 (post) · 1-day window · Directional read only
+  <span id="footerLabel">Post: May 31 – Jun 2 vs Pre: May 24–26</span>
 </footer>
 
 <script>
 const ranks = ['Rookie','Challenger','Proven','Accomplished','Remarkable'];
-const gc = '#e5e5e0';
-const tc = '#5a5a5a';
+const gc = '#e5e5e0', tc = '#5a5a5a';
 
-const base = {
+const D = {
+  day1: {
+    label: 'May 31 (Day 1)', comp: 'vs May 24',
+    base_post:   [2033, 1231, 1176, 1220, 631],
+    base_pct_pre:[5.4, 5.8, 8.9, 10.0, 8.8],
+    base_pct_post:[5.3, 5.0, 9.0, 10.3, 8.5],
+    pratio_whale_pre: [1.02,1.00,0.99,0.99,0.97],
+    pratio_whale_post:[0.84,0.88,0.87,0.87,0.86],
+    pratio_nw_pre: [1.01,1.01,1.00,0.99,1.00],
+    pratio_nw_post:[1.01,1.02,1.01,1.01,1.02],
+    wr_all_pre:   [64.8,62.0,62.1,62.8,54.6],
+    wr_all_post:  [76.2,70.9,73.4,76.1,71.1],
+    wr_ru_pre:    [41.1,44.7,43.3,44.9,48.1],
+    wr_ru_post:   [68.3,64.3,66.4,70.9,69.1],
+    quit_opp_whale_pre: [3.3,6.5,7.2,7.9,8.1],
+    quit_opp_whale_post:[7.5,10.0,12.5,16.0,15.8],
+    quit_opp_nw_pre:    [3.0,4.0,5.6,7.1,8.4],
+    quit_opp_nw_post:   [3.2,3.7,5.4,6.9,8.5],
+    league_whale_pre: [65.2,67.2,68.9,68.5,69.7],
+    league_whale_post:[63.3,59.6,57.1,54.2,49.8],
+    league_nw_pre:    [58.8,51.2,49.9,47.6,50.8],
+    league_nw_post:   [59.1,48.7,44.4,40.8,39.8],
+    pvp_whale_pre:    [3.9,3.9,4.5,5.1,5.0],
+    pvp_whale_post:   [4.1,4.0,4.4,5.1,5.7],
+    lge_whale_pre:    [3.1,3.1,3.3,3.4,3.7],
+    lge_whale_post:   [2.8,2.7,2.9,2.9,2.9],
+    time_whale_pre:   [58.1,61.0,67.5,67.8,78.4],
+    time_whale_post:  [57.1,55.7,61.3,62.1,71.2],
+    time_nw_pre:      [60.8,59.1,62.1,64.3,66.9],
+    time_nw_post:     [60.1,56.7,59.4,60.6,63.1],
+    has_selfquit: false, has_ndr: false, has_whalesfaced: false
+  },
+  '3day': {
+    label: 'May 31 – Jun 2 (3-Day)', comp: 'vs May 24–26',
+    base_post:   [4126, 2227, 1852, 1795, 901],
+    base_pct_pre:[5.6, 6.0, 9.0, 10.3, 8.8],
+    base_pct_post:[6.0, 5.9, 9.8, 10.9, 9.0],
+    pratio_whale_pre: [1.02,1.00,0.99,0.99,0.98],
+    pratio_whale_post:[0.84,0.89,0.88,0.87,0.87],
+    pratio_nw_pre: [1.01,1.01,1.00,0.99,1.00],
+    pratio_nw_post:[1.01,1.02,1.01,1.01,1.02],
+    wr_all_pre:   [65.3,61.5,63.3,63.7,55.9],
+    wr_all_post:  [75.0,70.9,72.8,74.6,69.4],
+    wr_ru_pre:    [39.1,41.3,42.5,43.6,46.0],
+    wr_ru_post:   [64.8,63.5,64.6,67.8,67.4],
+    quit_opp_whale_pre: [3.1,5.8,6.8,7.0,7.7],
+    quit_opp_whale_post:[6.7,10.1,12.4,14.4,14.8],
+    quit_opp_nw_pre:    [2.9,3.7,5.4,6.5,7.9],
+    quit_opp_nw_post:   [2.9,3.4,5.0,6.4,7.9],
+    quit_self_whale_pre: [4.5,6.3,7.2,7.6,7.5],
+    quit_self_whale_post:[2.0,4.4,4.5,4.3,4.4],
+    quit_self_nw_pre:    [2.9,4.0,5.0,5.9,7.5],
+    quit_self_nw_post:   [3.2,4.5,5.6,6.5,8.5],
+    league_whale_pre: [63.0,63.9,62.7,60.6,59.8],
+    league_whale_post:[64.6,65.6,62.3,58.6,57.3],
+    league_nw_pre:    [58.8,49.0,46.6,43.5,44.7],
+    league_nw_post:   [60.1,51.2,47.0,43.8,43.1],
+    pvp_whale_pre:    [3.9,3.9,4.6,5.0,4.9],
+    pvp_whale_post:   [4.2,4.1,4.8,5.3,5.6],
+    lge_whale_pre:    [2.8,2.9,3.0,2.9,2.9],
+    lge_whale_post:   [2.8,3.0,3.0,2.8,2.8],
+    time_whale_pre:   [55.7,58.8,64.6,64.6,70.2],
+    time_whale_post:  [57.8,59.7,66.0,65.8,74.3],
+    time_nw_pre:      [60.7,57.7,60.3,62.2,64.5],
+    time_nw_post:     [61.5,59.3,61.9,63.6,65.8],
+    ndr_whale_pre:    [64.0,67.5,78.0,78.5,77.0],
+    ndr_whale_post:   [65.0,72.5,79.5,80.5,79.0],
+    ndr_nw_pre:       [58.0,72.5,77.5,78.5,79.5],
+    ndr_nw_post:      [56.5,72.0,77.0,77.5,80.5],
+    whalesfaced_mean: [1,1,1,1,2],
+    whalesfaced_q50:  [1,1,1,1,1],
+    whalesfaced_q90:  [2,2,2,2,3],
+    has_selfquit: true, has_ndr: true, has_whalesfaced: true
+  }
+};
+
+const baseOpts = {
   responsive: true, maintainAspectRatio: false,
   plugins: { legend: { display: false } },
   scales: {
-    x: { ticks: { color: tc, font: { size: 11 }, autoSkip: false, maxRotation: 0 }, grid: { color: gc } },
+    x: { ticks: { color: tc, font: { size: 11 }, maxRotation: 0 }, grid: { color: gc } },
     y: { ticks: { color: tc, font: { size: 11 } }, grid: { color: gc } }
   }
 };
 
-/* 1. Eligible whale count — post */
-new Chart(document.getElementById('c_base_post'), {
-  type: 'bar',
-  data: {
-    labels: ranks,
-    datasets: [{
-      data: [2033, 1231, 1176, 1220, 631],
-      backgroundColor: ['#85B7EB','#7AC8D9','#5CC7A4','#D4A017','#D07050'],
-      borderRadius: 4
-    }]
-  },
-  options: {
-    ...base,
-    plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ` ${ctx.parsed.y.toLocaleString()} eligible whales` } } }
-  }
-});
+let charts = {};
 
-/* 2. % of rank that are whales — pre vs post */
-new Chart(document.getElementById('c_base_pct'), {
-  type: 'bar',
-  data: {
-    labels: ranks,
-    datasets: [
-      { label: 'Pre', data: [5.4, 5.8, 8.9, 10.0, 8.8], backgroundColor: '#D85A30', borderRadius: 4 },
-      { label: 'Post', data: [5.3, 5.0, 9.0, 10.3, 8.5], backgroundColor: '#1D9E75', borderRadius: 4 }
-    ]
-  },
-  options: {
-    ...base,
-    plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y.toFixed(1)}%` } } },
-    scales: {
-      x: { ...base.scales.x },
-      y: { ...base.scales.y, ticks: { ...base.scales.y.ticks, callback: v => v + '%' }, max: 14 }
-    }
-  }
-});
+function pct(v) { return v.toFixed(1) + '%'; }
+function pr(v)  { return v.toFixed(2); }
 
-/* 3. Whale PRatio — pre vs post */
-new Chart(document.getElementById('c_pratio_whale'), {
-  type: 'bar',
-  data: {
-    labels: ranks,
-    datasets: [
-      { label: 'Pre', data: [1.02, 1.00, 0.99, 0.99, 0.97], backgroundColor: '#D85A30', borderRadius: 4 },
-      { label: 'Post', data: [0.84, 0.88, 0.87, 0.87, 0.86], backgroundColor: '#1D9E75', borderRadius: 4 }
-    ]
-  },
-  options: {
-    ...base,
-    plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y.toFixed(2)}` } } },
-    scales: {
-      x: { ...base.scales.x },
-      y: { ...base.scales.y, min: 0.7, max: 1.1, ticks: { ...base.scales.y.ticks, callback: v => v.toFixed(2) } }
-    }
-  }
-});
+function deltaClass(v) { return v > 0 ? 'up' : v < 0 ? 'down' : 'flat'; }
+function deltaStr(v, decimals=1) { const s = v > 0 ? '+' : ''; return s + v.toFixed(decimals); }
 
-/* 4. Non-whale PRatio */
-new Chart(document.getElementById('c_pratio_nonwhale'), {
-  type: 'bar',
-  data: {
-    labels: ranks,
-    datasets: [
-      { label: 'Pre', data: [1.01, 1.01, 1.00, 0.99, 1.00], backgroundColor: '#D85A30', borderRadius: 4 },
-      { label: 'Post', data: [1.01, 1.02, 1.01, 1.01, 1.02], backgroundColor: '#85B7EB', borderRadius: 4 }
-    ]
-  },
-  options: {
-    ...base,
-    plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y.toFixed(2)}` } } },
-    scales: {
-      x: { ...base.scales.x },
-      y: { ...base.scales.y, min: 0.7, max: 1.1, ticks: { ...base.scales.y.ticks, callback: v => v.toFixed(2) } }
-    }
-  }
-});
+function destroyAll() { Object.values(charts).forEach(c => { if(c) c.destroy(); }); charts = {}; }
 
-/* 5. Whale real-user WR — line chart pre vs post */
-new Chart(document.getElementById('c_wr_whale'), {
-  type: 'bar',
-  data: {
-    labels: ranks,
-    datasets: [
-      { label: 'Pre — All Matches', data: [64.8, 62.0, 62.1, 62.8, 54.6], backgroundColor: 'rgba(216,90,48,0.3)', borderRadius: 4 },
-      { label: 'Pre — Real-User', data: [41.1, 44.7, 43.3, 44.9, 48.1], backgroundColor: '#D85A30', borderRadius: 4 },
-      { label: 'Post — All Matches', data: [76.2, 70.9, 73.4, 76.1, 71.1], backgroundColor: 'rgba(29,158,117,0.3)', borderRadius: 4 },
-      { label: 'Post — Real-User', data: [68.3, 64.3, 66.4, 70.9, 69.1], backgroundColor: '#1D9E75', borderRadius: 4 }
-    ]
-  },
-  options: {
-    ...base,
-    plugins: {
-      legend: { display: true, position: 'top', labels: { font: { size: 11 }, color: tc, boxWidth: 12, padding: 16 } },
-      tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y.toFixed(1)}%` } }
-    },
-    scales: {
-      x: { ...base.scales.x },
-      y: { ...base.scales.y, min: 30, max: 85, ticks: { ...base.scales.y.ticks, callback: v => v + '%' } }
-    }
-  }
-});
+function buildChart(id, config) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  charts[id] = new Chart(el, config);
+}
 
-/* 6. Whale quit rate */
-new Chart(document.getElementById('c_quit_whale'), {
-  type: 'bar',
-  data: {
-    labels: ranks,
-    datasets: [
-      { label: 'Pre', data: [3.3, 6.5, 7.2, 7.9, 8.1], backgroundColor: '#D85A30', borderRadius: 4 },
-      { label: 'Post', data: [7.5, 10.0, 12.5, 16.0, 15.8], backgroundColor: '#BA7517', borderRadius: 4 }
-    ]
-  },
-  options: {
-    ...base,
-    plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y.toFixed(1)}%` } } },
-    scales: {
-      x: { ...base.scales.x },
-      y: { ...base.scales.y, ticks: { ...base.scales.y.ticks, callback: v => v + '%' } }
-    }
-  }
-});
+function renderKPIs(d) {
+  const row = document.getElementById('kpiRow');
+  const wrDelta = (d.wr_ru_post.reduce((a,b)=>a+b,0)/5 - d.wr_ru_pre.reduce((a,b)=>a+b,0)/5).toFixed(0);
+  const pratioAvg = (d.pratio_whale_post.reduce((a,b)=>a+b,0)/5).toFixed(2);
+  const leagueDelta = ((d.league_whale_post.reduce((a,b)=>a+b,0)/5) - (d.league_whale_pre.reduce((a,b)=>a+b,0)/5)).toFixed(1);
+  const ndrLine = d.has_ndr
+    ? `<div class="kpi-card"><p class="kpi-label">Whale PvP NDR</p><p class="kpi-value up">+1.5pp</p><p class="kpi-note">69% → 70.5% overall</p></div>`
+    : `<div class="kpi-card"><p class="kpi-label">Opp quit rate</p><p class="kpi-value down">~2×</p><p class="kpi-note">expected — weaker opps forfeit</p></div>`;
+  const selfLine = d.has_selfquit
+    ? `<div class="kpi-card"><p class="kpi-label">Whale self-quit ↓</p><p class="kpi-value up">−3–5pp</p><p class="kpi-note">whales playing through matches</p></div>`
+    : `<div class="kpi-card"><p class="kpi-label">Non-whale PRatio</p><p class="kpi-value neutral">1.01</p><p class="kpi-note">unchanged — surgical change</p></div>`;
+  row.innerHTML = `
+    <div class="kpi-card"><p class="kpi-label">Whale real-user WR avg</p><p class="kpi-value up">+${wrDelta}pp</p><p class="kpi-note">sub-50% → 64–68% across ranks</p></div>
+    <div class="kpi-card"><p class="kpi-label">Whale PRatio (real users)</p><p class="kpi-value down">${pratioAvg}</p><p class="kpi-note">was ~0.99 · opponents weaker ✓</p></div>
+    <div class="kpi-card"><p class="kpi-label">Non-whale PRatio</p><p class="kpi-value neutral">1.01</p><p class="kpi-note">unchanged · change is surgical</p></div>
+    ${selfLine}
+    <div class="kpi-card"><p class="kpi-label">Whale league adoption</p><p class="kpi-value down">${leagueDelta}pp avg</p><p class="kpi-note">shifting to PvP as intended</p></div>
+  `;
+}
 
-/* 7. Non-whale quit rate */
-new Chart(document.getElementById('c_quit_nonwhale'), {
-  type: 'bar',
-  data: {
-    labels: ranks,
-    datasets: [
-      { label: 'Pre', data: [3.0, 4.0, 5.6, 7.1, 8.4], backgroundColor: '#D85A30', borderRadius: 4 },
-      { label: 'Post', data: [3.2, 3.7, 5.4, 6.9, 8.5], backgroundColor: '#85B7EB', borderRadius: 4 }
-    ]
-  },
-  options: {
-    ...base,
-    plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y.toFixed(1)}%` } } },
-    scales: {
-      x: { ...base.scales.x },
-      y: { ...base.scales.y, ticks: { ...base.scales.y.ticks, callback: v => v + '%' } }
-    }
-  }
-});
+function renderInsights(id, htmlArr) {
+  document.getElementById(id).innerHTML = htmlArr.join('');
+}
 
-/* 8. League adoption — grouped */
-new Chart(document.getElementById('c_league_adopt'), {
-  type: 'bar',
-  data: {
-    labels: ranks,
-    datasets: [
-      { label: 'Whale Pre',     data: [65.2, 67.2, 68.9, 68.5, 69.7], backgroundColor: '#D4A017', borderRadius: 4 },
-      { label: 'Whale Post',    data: [63.3, 59.6, 57.1, 54.2, 49.8], backgroundColor: '#BA7517', borderRadius: 4 },
-      { label: 'Non-Whale Pre', data: [58.8, 51.2, 49.9, 47.6, 50.8], backgroundColor: '#85B7EB', borderRadius: 4 },
-      { label: 'Non-Whale Post',data: [59.1, 48.7, 44.4, 40.8, 39.8], backgroundColor: '#185FA5', borderRadius: 4 }
-    ]
-  },
-  options: {
-    ...base,
-    plugins: {
-      legend: { display: true, position: 'top', labels: { font: { size: 11 }, color: tc, boxWidth: 12, padding: 16 } },
-      tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y.toFixed(1)}%` } }
-    },
-    scales: {
-      x: { ...base.scales.x },
-      y: { ...base.scales.y, min: 30, max: 80, ticks: { ...base.scales.y.ticks, callback: v => v + '%' } }
-    }
-  }
-});
+function ins(cls, html) { return `<div class="insight ${cls}">${html}</div>`; }
 
-/* 9. Whale time spent */
-new Chart(document.getElementById('c_time_whale'), {
-  type: 'bar',
-  data: {
-    labels: ['Rookie','Challenger','Proven','Accomplished','Remarkable'],
-    datasets: [
-      { label: 'Pre', data: [58.1, 61.0, 67.5, 67.8, 78.4], backgroundColor: '#D85A30', borderRadius: 4 },
-      { label: 'Post', data: [57.1, 55.7, 61.3, 62.1, 71.2], backgroundColor: '#1D9E75', borderRadius: 4 }
-    ]
-  },
-  options: {
-    ...base,
-    plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y.toFixed(1)} mins` } } },
-    scales: {
-      x: { ...base.scales.x },
-      y: { ...base.scales.y, min: 40, max: 90, ticks: { ...base.scales.y.ticks, callback: v => v + ' m' } }
-    }
-  }
-});
+function buildWRTable(d) {
+  const tbl = document.getElementById('tbl_wr');
+  const rows = ranks.map((r,i) => {
+    const allD = (d.wr_all_post[i] - d.wr_all_pre[i]).toFixed(1);
+    const ruD  = (d.wr_ru_post[i]  - d.wr_ru_pre[i]).toFixed(1);
+    return `<tr>
+      <td><span class="rank-badge rank-${r}">${r}</span></td>
+      <td class="val-muted">${d.wr_all_pre[i]}%</td><td class="val-up">${d.wr_all_post[i].toFixed(1)}%</td><td><span class="delta-pill up">+${allD}pp</span></td>
+      <td class="val-down">${d.wr_ru_pre[i]}%</td><td class="val-up">${d.wr_ru_post[i].toFixed(1)}%</td><td><span class="delta-pill up">+${ruD}pp</span></td>
+    </tr>`;
+  }).join('');
+  tbl.innerHTML = `<thead>
+    <tr><th>Rank</th><th colspan="3" style="text-align:center;padding-bottom:4px">All Matches WR</th><th colspan="3" style="text-align:center;padding-bottom:4px">Real-User WR ★</th></tr>
+    <tr><th></th><th class="pre">Pre</th><th class="post">Post</th><th class="delta">Δ</th><th class="pre">Pre</th><th class="post">Post</th><th class="delta">Δ</th></tr>
+  </thead><tbody>${rows}</tbody>`;
+}
 
-/* 10. Non-whale time spent */
-new Chart(document.getElementById('c_time_nonwhale'), {
-  type: 'bar',
-  data: {
-    labels: ['Rookie','Challenger','Proven','Accomplished','Remarkable'],
-    datasets: [
-      { label: 'Pre', data: [60.8, 59.1, 62.1, 64.3, 66.9], backgroundColor: '#D85A30', borderRadius: 4 },
-      { label: 'Post', data: [60.1, 56.7, 59.4, 60.6, 63.1], backgroundColor: '#85B7EB', borderRadius: 4 }
-    ]
-  },
-  options: {
-    ...base,
-    plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y.toFixed(1)} mins` } } },
-    scales: {
-      x: { ...base.scales.x },
-      y: { ...base.scales.y, min: 40, max: 90, ticks: { ...base.scales.y.ticks, callback: v => v + ' m' } }
-    }
+function buildMatchesTable(d) {
+  const tbl = document.getElementById('tbl_matches');
+  const rows = ranks.map((r,i) => {
+    const pvpD = (d.pvp_whale_post[i] - d.pvp_whale_pre[i]).toFixed(1);
+    const lgeD = (d.lge_whale_post[i] - d.lge_whale_pre[i]).toFixed(1);
+    const pvpCls = pvpD >= 0 ? 'up' : 'down';
+    const lgeCls = lgeD <= 0 ? 'up' : 'down';
+    return `<tr>
+      <td><span class="rank-badge rank-${r}">${r}</span></td>
+      <td>${d.pvp_whale_pre[i]}</td><td class="val-${pvpCls}">${d.pvp_whale_post[i]}</td><td><span class="delta-pill ${pvpCls}">${pvpD >= 0 ? '+' : ''}${pvpD}</span></td>
+      <td>${d.lge_whale_pre[i]}</td><td class="val-down">${d.lge_whale_post[i]}</td><td><span class="delta-pill up">${lgeD}</span></td>
+    </tr>`;
+  }).join('');
+  tbl.innerHTML = `<thead>
+    <tr><th>Rank</th><th colspan="3" style="text-align:center;padding-bottom:4px">PvP Matches/Day</th><th colspan="3" style="text-align:center;padding-bottom:4px">League Matches/Day</th></tr>
+    <tr><th></th><th class="pre">Pre</th><th class="post">Post</th><th class="delta">Δ</th><th class="pre">Pre</th><th class="post">Post</th><th class="delta">Δ</th></tr>
+  </thead><tbody>${rows}</tbody>`;
+}
+
+function render(key) {
+  const d = D[key];
+  destroyAll();
+
+  // caveat + meta
+  document.getElementById('compLabel').textContent = d.comp;
+  document.getElementById('caveatText').textContent = key === '3day'
+    ? '3-day post-change read (May 31 – Jun 2) vs May 24–26. Signals are stabilising but continue monitoring.'
+    : '1 day of post-change data — directional signals only. Continue monitoring for stabilisation.';
+  document.getElementById('footerLabel').textContent = key === '3day'
+    ? 'Post: May 31 – Jun 2 vs Pre: May 24–26'
+    : 'Post: May 31 vs Pre: May 24 · 1-day window';
+
+  // section numbering
+  const hasNDR = d.has_ndr;
+  document.getElementById('timespent_num').textContent = hasNDR ? '07 — Time spent' : '06 — Time spent';
+  document.getElementById('openq_num').textContent     = hasNDR ? '09 — Open questions' : '07 — Open questions';
+  document.getElementById('ndr_section').classList.toggle('hidden', !hasNDR);
+  document.getElementById('whalesfaced_section').classList.toggle('hidden', !d.has_whalesfaced);
+
+
+  renderKPIs(d);
+  buildWRTable(d);
+  buildMatchesTable(d);
+
+  // ── CHARTS ──
+  buildChart('c_base_post', { type:'bar', data:{ labels:ranks, datasets:[{ data:d.base_post, backgroundColor:['#85B7EB','#7AC8D9','#5CC7A4','#D4A017','#D07050'], borderRadius:4 }]}, options:{...baseOpts, plugins:{legend:{display:false}, tooltip:{callbacks:{label:ctx=>` ${ctx.parsed.y.toLocaleString()} whales`}}}} });
+
+  buildChart('c_base_pct', { type:'bar', data:{ labels:ranks, datasets:[
+    {label:'Pre', data:d.base_pct_pre, backgroundColor:'#D85A30', borderRadius:4},
+    {label:'Post', data:d.base_pct_post, backgroundColor:'#1D9E75', borderRadius:4}
+  ]}, options:{...baseOpts, scales:{x:baseOpts.scales.x, y:{...baseOpts.scales.y, max:14, ticks:{...baseOpts.scales.y.ticks, callback:v=>v+'%'}}}, plugins:{legend:{display:false}, tooltip:{callbacks:{label:ctx=>` ${ctx.dataset.label}: ${ctx.parsed.y.toFixed(1)}%`}}}} });
+
+  buildChart('c_pratio_whale', { type:'bar', data:{ labels:ranks, datasets:[
+    {label:'Pre', data:d.pratio_whale_pre, backgroundColor:'#D85A30', borderRadius:4},
+    {label:'Post', data:d.pratio_whale_post, backgroundColor:'#1D9E75', borderRadius:4}
+  ]}, options:{...baseOpts, scales:{x:baseOpts.scales.x, y:{...baseOpts.scales.y, min:0.7, max:1.1, ticks:{...baseOpts.scales.y.ticks, callback:v=>v.toFixed(2)}}}, plugins:{legend:{display:false}, tooltip:{callbacks:{label:ctx=>` ${ctx.dataset.label}: ${ctx.parsed.y.toFixed(2)}`}}}} });
+
+  buildChart('c_pratio_nonwhale', { type:'bar', data:{ labels:ranks, datasets:[
+    {label:'Pre', data:d.pratio_nw_pre, backgroundColor:'#D85A30', borderRadius:4},
+    {label:'Post', data:d.pratio_nw_post, backgroundColor:'#85B7EB', borderRadius:4}
+  ]}, options:{...baseOpts, scales:{x:baseOpts.scales.x, y:{...baseOpts.scales.y, min:0.7, max:1.1, ticks:{...baseOpts.scales.y.ticks, callback:v=>v.toFixed(2)}}}, plugins:{legend:{display:false}, tooltip:{callbacks:{label:ctx=>` ${ctx.dataset.label}: ${ctx.parsed.y.toFixed(2)}`}}}} });
+
+  buildChart('c_wr_whale', { type:'bar', data:{ labels:ranks, datasets:[
+    {label:'Pre — All Matches', data:d.wr_all_pre, backgroundColor:'rgba(216,90,48,0.3)', borderRadius:4},
+    {label:'Pre — Real-User',   data:d.wr_ru_pre,  backgroundColor:'#D85A30', borderRadius:4},
+    {label:'Post — All Matches',data:d.wr_all_post, backgroundColor:'rgba(29,158,117,0.3)', borderRadius:4},
+    {label:'Post — Real-User',  data:d.wr_ru_post, backgroundColor:'#1D9E75', borderRadius:4}
+  ]}, options:{...baseOpts, plugins:{legend:{display:true, position:'top', labels:{font:{size:11}, color:tc, boxWidth:12, padding:14}}, tooltip:{callbacks:{label:ctx=>` ${ctx.dataset.label}: ${ctx.parsed.y.toFixed(1)}%`}}}, scales:{x:baseOpts.scales.x, y:{...baseOpts.scales.y, min:30, max:85, ticks:{...baseOpts.scales.y.ticks, callback:v=>v+'%'}}}} });
+
+  const quitYOpts = { ...baseOpts.scales.y, ticks: { ...baseOpts.scales.y.ticks, callback: v => v + '%' } };
+
+  buildChart('c_quit_opp_whale', { type:'bar', data:{ labels:ranks, datasets:[
+    {label:'Pre', data:d.quit_opp_whale_pre, backgroundColor:'#D85A30', borderRadius:4},
+    {label:'Post', data:d.quit_opp_whale_post, backgroundColor:'#BA7517', borderRadius:4}
+  ]}, options:{...baseOpts, plugins:{legend:{display:false}, tooltip:{callbacks:{label:ctx=>` ${ctx.dataset.label}: ${ctx.parsed.y.toFixed(1)}%`}}}, scales:{x:baseOpts.scales.x, y:quitYOpts}} });
+
+  buildChart('c_quit_opp_nw', { type:'bar', data:{ labels:ranks, datasets:[
+    {label:'Pre', data:d.quit_opp_nw_pre, backgroundColor:'#D85A30', borderRadius:4},
+    {label:'Post', data:d.quit_opp_nw_post, backgroundColor:'#85B7EB', borderRadius:4}
+  ]}, options:{...baseOpts, plugins:{legend:{display:false}, tooltip:{callbacks:{label:ctx=>` ${ctx.dataset.label}: ${ctx.parsed.y.toFixed(1)}%`}}}, scales:{x:baseOpts.scales.x, y:quitYOpts}} });
+
+  document.getElementById('selfquit_row').classList.toggle('hidden', !d.has_selfquit);
+  if (d.has_selfquit) {
+    buildChart('c_quit_self_whale', { type:'bar', data:{ labels:ranks, datasets:[
+      {label:'Pre', data:d.quit_self_whale_pre, backgroundColor:'#D85A30', borderRadius:4},
+      {label:'Post', data:d.quit_self_whale_post, backgroundColor:'#1D9E75', borderRadius:4}
+    ]}, options:{...baseOpts, plugins:{legend:{display:false}, tooltip:{callbacks:{label:ctx=>` ${ctx.dataset.label}: ${ctx.parsed.y.toFixed(1)}%`}}}, scales:{x:baseOpts.scales.x, y:quitYOpts}} });
+
+    buildChart('c_quit_self_nw', { type:'bar', data:{ labels:ranks, datasets:[
+      {label:'Pre', data:d.quit_self_nw_pre, backgroundColor:'#D85A30', borderRadius:4},
+      {label:'Post', data:d.quit_self_nw_post, backgroundColor:'#85B7EB', borderRadius:4}
+    ]}, options:{...baseOpts, plugins:{legend:{display:false}, tooltip:{callbacks:{label:ctx=>` ${ctx.dataset.label}: ${ctx.parsed.y.toFixed(1)}%`}}}, scales:{x:baseOpts.scales.x, y:quitYOpts}} });
   }
-});
+
+  buildChart('c_league', { type:'bar', data:{ labels:ranks, datasets:[
+    {label:'Whale Pre',     data:d.league_whale_pre, backgroundColor:'#D4A017', borderRadius:4},
+    {label:'Whale Post',    data:d.league_whale_post, backgroundColor:'#BA7517', borderRadius:4},
+    {label:'Non-Whale Pre', data:d.league_nw_pre, backgroundColor:'#85B7EB', borderRadius:4},
+    {label:'Non-Whale Post',data:d.league_nw_post, backgroundColor:'#185FA5', borderRadius:4}
+  ]}, options:{...baseOpts, plugins:{legend:{display:true, position:'top', labels:{font:{size:11}, color:tc, boxWidth:12, padding:14}}, tooltip:{callbacks:{label:ctx=>` ${ctx.dataset.label}: ${ctx.parsed.y.toFixed(1)}%`}}}, scales:{x:baseOpts.scales.x, y:{...baseOpts.scales.y, min:30, max:80, ticks:{...baseOpts.scales.y.ticks, callback:v=>v+'%'}}}} });
+
+  if (d.has_ndr) {
+    buildChart('c_ndr_whale', { type:'bar', data:{ labels:ranks, datasets:[
+      {label:'Pre', data:d.ndr_whale_pre, backgroundColor:'#D85A30', borderRadius:4},
+      {label:'Post', data:d.ndr_whale_post, backgroundColor:'#1D9E75', borderRadius:4}
+    ]}, options:{...baseOpts, scales:{x:baseOpts.scales.x, y:{...baseOpts.scales.y, min:50, max:90, ticks:{...baseOpts.scales.y.ticks, callback:v=>v+'%'}}}, plugins:{legend:{display:false}, tooltip:{callbacks:{label:ctx=>` ${ctx.dataset.label}: ${ctx.parsed.y.toFixed(1)}%`}}}} });
+
+    buildChart('c_ndr_nonwhale', { type:'bar', data:{ labels:ranks, datasets:[
+      {label:'Pre', data:d.ndr_nw_pre, backgroundColor:'#D85A30', borderRadius:4},
+      {label:'Post', data:d.ndr_nw_post, backgroundColor:'#85B7EB', borderRadius:4}
+    ]}, options:{...baseOpts, scales:{x:baseOpts.scales.x, y:{...baseOpts.scales.y, min:50, max:90, ticks:{...baseOpts.scales.y.ticks, callback:v=>v+'%'}}}, plugins:{legend:{display:false}, tooltip:{callbacks:{label:ctx=>` ${ctx.dataset.label}: ${ctx.parsed.y.toFixed(1)}%`}}}} });
+  }
+
+  buildChart('c_time_whale', { type:'bar', data:{ labels:ranks, datasets:[
+    {label:'Pre', data:d.time_whale_pre, backgroundColor:'#D85A30', borderRadius:4},
+    {label:'Post', data:d.time_whale_post, backgroundColor:'#1D9E75', borderRadius:4}
+  ]}, options:{...baseOpts, scales:{x:baseOpts.scales.x, y:{...baseOpts.scales.y, min:40, max:90, ticks:{...baseOpts.scales.y.ticks, callback:v=>v+' m'}}}, plugins:{legend:{display:false}, tooltip:{callbacks:{label:ctx=>` ${ctx.dataset.label}: ${ctx.parsed.y.toFixed(1)} mins`}}}} });
+
+  buildChart('c_time_nonwhale', { type:'bar', data:{ labels:ranks, datasets:[
+    {label:'Pre', data:d.time_nw_pre, backgroundColor:'#D85A30', borderRadius:4},
+    {label:'Post', data:d.time_nw_post, backgroundColor:'#85B7EB', borderRadius:4}
+  ]}, options:{...baseOpts, scales:{x:baseOpts.scales.x, y:{...baseOpts.scales.y, min:40, max:90, ticks:{...baseOpts.scales.y.ticks, callback:v=>v+' m'}}}, plugins:{legend:{display:false}, tooltip:{callbacks:{label:ctx=>` ${ctx.dataset.label}: ${ctx.parsed.y.toFixed(1)} mins`}}}} });
+
+  if (d.has_whalesfaced) {
+    buildChart('c_whalesfaced', { type:'bar', data:{ labels:ranks, datasets:[
+      {label:'Mean', data:d.whalesfaced_mean, backgroundColor:'#85B7EB', borderRadius:4},
+      {label:'Q50',  data:d.whalesfaced_q50,  backgroundColor:'#185FA5', borderRadius:4},
+      {label:'Q90',  data:d.whalesfaced_q90,  backgroundColor:'#D85A30', borderRadius:4}
+    ]}, options:{...baseOpts, plugins:{legend:{display:true, position:'top', labels:{font:{size:11}, color:tc, boxWidth:12, padding:12}}, tooltip:{callbacks:{label:ctx=>` ${ctx.dataset.label}: ${ctx.parsed.y.toFixed(1)}`}}}, scales:{x:baseOpts.scales.x, y:{...baseOpts.scales.y, max:5, ticks:{...baseOpts.scales.y.ticks, stepSize:1}}}} });
+  }
+
+  // ── INSIGHTS ──
+  renderInsights('ins_base', [
+    ins('good', '<strong>Eligible base is stable.</strong> Whale % per rank shifted by ≤0.4pp across both windows. No composition change between comparison dates — pre/post differences are attributable to the matchmaking change, not a different user mix.')
+  ]);
+
+  renderInsights('ins_pratio', [
+    ins('good', '<strong>Power band is working and holding.</strong> Whale PRatio is 0.84–0.89 across all ranks ' + (key==='3day'?'in the 3-day window':'on Day 1') + ', down from ~0.97–1.02 pre-change. Opponents are genuinely weaker.'),
+    ins('good', '<strong>Non-whale pool unaffected.</strong> Non-whale PRatio is ~1.01 both pre and post. The change is surgical.')
+  ]);
+
+  const ruAvgPre  = (d.wr_ru_pre.reduce((a,b)=>a+b,0)/5).toFixed(0);
+  const ruAvgPost = (d.wr_ru_post.reduce((a,b)=>a+b,0)/5*100).toFixed(0);
+  renderInsights('ins_wr', [
+    ins('warn', '<strong>Pre-change: whales were losing to real users across every rank.</strong> Real-user WR was ' + ruAvgPre + '% on average — sub-50%. Whales were being punished for spending.'),
+    ins('good', '<strong>Post-change: consistent 20–28pp gain across all ranks.</strong> Real-user WR is now ' + ruAvgPost + '% on average. ' + (key==='3day' ? 'The Day 1 spike has moderated slightly but the improvement is holding firmly.' : 'Rookie shows the largest jump (+27pp) where the D3 whale problem was most acute.')),
+    ins('', '<strong>Non-whale WR unchanged.</strong> The gain is not coming at the broader population\'s cost.')
+  ]);
+
+  const quitIns = [
+    ins('warn', '<strong>Opponent quit rate roughly doubled for whales at higher ranks</strong> — ~14–15% at Accomplished/Remarkable (was ~7–8%). Expected: weaker opponents see the mismatch and forfeit. Non-whale quit rate is flat.')
+  ];
+  if (d.has_selfquit) {
+    quitIns.push(ins('good', '<strong>Whales are playing through their matches.</strong> Whale self-quit dropped from 4.5–7.6% to 2.0–4.4% — now below non-whale self-quit at every rank. Pre-change, whales were rage-quitting their own matches. That pain signal is gone.'));
+  }
+  quitIns.push(ins('warn', '<strong>Same-day cooldown is not yet shipped.</strong> Monitor opponent quit rates closely — repeated exposure of the same non-whale to a Q90 whale in a single day could drive churn.'));
+  renderInsights('ins_quit', quitIns);
+
+  const leagueInsights = key === '3day' ? [
+    ins('good', '<strong>Engagement shift is holding across 3 days.</strong> Whale League adoption is down at Proven (−4.4pp), Accomplished (−2.0pp), and Remarkable (−2.5pp). The reversal is consistent, not a Day 1 spike.'),
+    ins('good', '<strong>Whale PvP matches/day ticked up across all ranks.</strong> League matches/day is flat to slightly down. Whales are choosing PvP more.'),
+    ins('', '<strong>Non-whale League adoption is broadly stable.</strong> Unlike the Day 1 read, the 3-day window shows non-whale League behaviour is not meaningfully affected.')
+  ] : [
+    ins('good', '<strong>Engagement shift confirmed.</strong> Whale League adoption fell 2–20pp across ranks (Remarkable: −19.9pp). League matches/day down 0.3–0.8. Whales are responding to a better PvP experience.'),
+    ins('warn', '<strong>Non-whale League adoption also dipped at higher ranks.</strong> May be correlated — non-whales quitting against whales and disengaging. Separate from the whale effect before drawing conclusions.')
+  ];
+  renderInsights('ins_engagement', leagueInsights);
+
+  if (d.has_ndr) {
+    renderInsights('ins_ndr', [
+      ins('good', '<strong>Whale NDR improved from 69% → 70.5% (+1.5pp)</strong> overall. Non-whale dipped marginally from 68% → 67.5%. A better PvP experience is translating into whales returning to the game the next day.'),
+      ins('good', '<strong>Whale NDR now exceeds non-whale at every rank except Remarkable.</strong> Rookie whale NDR is 65% vs non-whale 56.5%. This is particularly meaningful — early-stage whales who were churning due to bad PvP experience are now sticking around.'),
+      ins('warn', '<strong>Remarkable whale NDR (79%) is just below non-whale (80.5%)</strong> — the only rank where the gap hasn\'t flipped. Worth watching as the rank with the highest average matches/day and the strongest pre-change pain.')
+    ]);
+  }
+
+  const timeInsights = key === '3day' ? [
+    ins('good', '<strong>The Day 1 time-spent dip has reversed.</strong> In the 3-day window, whale time spent is up 2.1–4.1 mins at Proven, Accomplished, and Remarkable vs pre-change. The Day 1 drop was likely noise from match distribution on a single day.'),
+    ins('', '<strong>Non-whale time spent is flat to slightly up</strong> across all ranks (±1–2 mins). No negative spillover from the matchmaking change on the broader population\'s session depth.')
+  ] : [
+    ins('warn', '<strong>Whale session time is down 1–7 mins across all ranks</strong> (largest at Remarkable: −7.2 mins, Proven: −6.2 mins). Likely inflated pre-change by grinding through harder opponents. Monitor over the next few days to see if this stabilises.'),
+    ins('', '<strong>Non-whale time also dipped slightly (−1 to −4 mins)</strong> — suggests part of this may be a day-level effect rather than purely the matchmaking change.')
+  ];
+  renderInsights('ins_time', timeInsights);
+
+  if (d.has_whalesfaced) {
+    renderInsights('ins_whalesfaced', [
+      ins('', '<strong>Median non-whale faces 1 whale per day across all ranks.</strong> Q50 is 1 at every rank — most non-whales encounter at most one Q90 opponent in a day.'),
+      ins('warn', '<strong>Q90 reaches 2–3, with Remarkable hitting 3.</strong> A small tail of non-whale users at Remarkable are facing Q90 whales repeatedly in a single day. This is the highest-urgency case for the same-day cooldown.'),
+      ins('warn', '<strong>Same-day cooldown is not yet shipped — Remarkable warrants prioritisation.</strong> At lower ranks (Rookie–Accomplished), repeated exposure is low enough that the cooldown is not urgent. Remarkable is the exception.')
+    ]);
+  }
+
+  const openQs = key === '3day' ? [
+    { icon:'💰', title:'Monetisation conversion', desc:'Does better PvP experience convert into spend? Track LTV and purchase frequency for eligible whales over the next 7–14 days vs a matched pre-change cohort.' },
+    { icon:'🏆', title:'Rank progression speed', desc:'Higher win rates → faster rank-ups. Are whales now moving through rep ranks faster, and does that push them out of Q90 eligibility — making the system partially self-correcting?' },
+    { icon:'🔄', title:'Win streak reversion rate', desc:'How often are whales hitting the ≥4 win streak threshold and reverting to normal matchmaking? If most never reach this, the power band stays on indefinitely for the majority.' },
+    { icon:'⚡', title:'Same-day cooldown prioritisation', desc:'Remarkable Q90 non-whales face up to 3 whales/day. Ship the cooldown for Remarkable first, then evaluate whether lower ranks need it based on continued monitoring.' }
+  ] : [
+    { icon:'📊', title:'Win streak reversion rate', desc:'How often are whales hitting the ≥4 win streak threshold and reverting to normal matchmaking? If most whales never reach this, the reversion logic is largely inactive.' },
+    { icon:'📉', title:'Weaker-opponent churn signal', desc:'Non-whales who quit against Q90 whales — are they churning from PvP? Track D3 and D7 retention for this sub-segment.' },
+    { icon:'💰', title:'Monetisation conversion', desc:'Do whales with better PvP experience spend more in the following week? LTV and purchase frequency for eligible whales post-change vs matched pre-change cohort.' },
+    { icon:'🏆', title:'Rank progression speed', desc:'Higher win rates mean faster rank-ups. Does that push whales out of Q90 eligibility — making the system partially self-correcting?' }
+  ];
+  document.getElementById('openq_grid').innerHTML = openQs.map(q => `
+    <div class="opp-card">
+      <div class="opp-icon" style="background:var(--blue-light);">${q.icon}</div>
+      <p class="opp-title">${q.title}</p>
+      <p class="opp-desc">${q.desc}</p>
+    </div>`).join('');
+}
+
+// Init
+render('3day');
+document.getElementById('timelineSelect').addEventListener('change', e => render(e.target.value));
 </script>
 </body>
 </html>
