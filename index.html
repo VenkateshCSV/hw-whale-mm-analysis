@@ -1074,6 +1074,10 @@ const overallData = {
 // ══════════════════════════════════════════════
 // OVERALL PAGE RENDERING
 // ══════════════════════════════════════════════
+// Rank colours — Pre uses muted versions, Post uses vivid versions
+const rankColorsPre  = ['#8FAFD4', '#60A898', '#B8A040', '#C07850', '#A87898'];
+const rankColorsPost = ['#2E7FCC', '#1D9E75', '#D4A017', '#D85A30', '#9B5E8A'];
+
 function buildOverallChart(id, preVals, postVals, opts = {}) {
   const el = document.getElementById(id);
   if (!el) return;
@@ -1093,14 +1097,28 @@ function buildOverallChart(id, preVals, postVals, opts = {}) {
     data: {
       labels: ranks,
       datasets: [
-        { label: overallData.pre.label,  data: preVals,  backgroundColor: '#D85A30', borderRadius: 4 },
-        { label: overallData.post.label, data: postVals, backgroundColor: '#1D9E75', borderRadius: 4 }
+        {
+          label: overallData.pre.label,
+          data: preVals,
+          backgroundColor: rankColorsPre,
+          borderRadius: 4
+        },
+        {
+          label: overallData.post.label,
+          data: postVals,
+          backgroundColor: rankColorsPost,
+          borderRadius: 4
+        }
       ]
     },
     options: {
       ...baseOpts,
       plugins: {
-        legend: { display: true, position: 'top', labels: { font: { size: 10 }, color: tc, boxWidth: 10, padding: 10 } },
+        legend: {
+          display: true,
+          position: 'top',
+          labels: { font: { size: 10 }, color: tc, boxWidth: 10, padding: 10 }
+        },
         tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${fmtFn(ctx.parsed.y)}` } }
       },
       scales: { x: baseOpts.scales.x, y: yScale }
